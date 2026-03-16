@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: todo-pro-db
+    restart: always
+    environment:
+      POSTGRES_USER: todopro_user
+      POSTGRES_PASSWORD: todopro_password
+      POSTGRES_DB: todopro_db
+    ports:
+      - "5433:5432" # Porta 5433 no seu PC -> 5432 no Docker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - todo-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: todo-pro-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "9000:80"
+    depends_on:
+      - db
+    networks:
+      - todo-network
+
+networks:
+  todo-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
