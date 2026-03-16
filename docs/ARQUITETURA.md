@@ -56,7 +56,7 @@ A organização visa separar as responsabilidades e facilitar o pipeline de CI/C
 /todo-application
 ├── .github/workflows/      # Pipelines de CI/CD (GitHub Actions)
 ├── backend/                # Spring Boot App (Gradle)
-│   ├── src/main/java/com/italo/todopro/
+│   ├── src/main/java/com/italooliveira/projeto/
 │   │   ├── config/         # Security, JWT, Swagger
 │   │   ├── controllers/    # Camada de entrada REST
 │   │   ├── domain/         # Entidades JPA e Enums
