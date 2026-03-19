@@ -6,7 +6,6 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate # Com Flyway, o Hibernate APENAS valida
     show-sql: true
