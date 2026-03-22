@@ -10,3 +10,10 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: false
+  config:
+    import: optional:file:.env[.properties]
+
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET}
