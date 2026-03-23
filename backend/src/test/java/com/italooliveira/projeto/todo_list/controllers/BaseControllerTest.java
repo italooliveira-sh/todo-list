@@ -3,7 +3,6 @@ package com.italooliveira.projeto.todo_list.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.italooliveira.projeto.todo_list.repositories.UserRepository;
 import com.italooliveira.projeto.todo_list.services.TokenService;
-import com.italooliveira.projeto.todo_list.mappers.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -25,6 +24,4 @@ public abstract class BaseControllerTest {
     @MockitoBean
     protected UserRepository userRepository;
 
-    @MockitoBean
-    protected UserMapper userMapper;
 }
