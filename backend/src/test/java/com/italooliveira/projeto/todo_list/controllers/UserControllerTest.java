@@ -1,19 +1,17 @@
 package com.italooliveira.projeto.todo_list.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.italooliveira.projeto.todo_list.dto.UserRegistrationDTO;
 import com.italooliveira.projeto.todo_list.dto.UserResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.EmailAlreadyExistsException;
 import com.italooliveira.projeto.todo_list.exceptions.UsernameAlreadyExistsException;
+
 import com.italooliveira.projeto.todo_list.services.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -25,16 +23,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class UserControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+class UserControllerTest extends BaseControllerTest{
 
     @MockitoBean
     private UserService userService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     @DisplayName("Deve retornar 201 ao registar um utilizador com sucesso")
@@ -50,7 +42,7 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("italo"))
+                .andExpect(jsonPath("$.name").value("italo"))
                 .andExpect(jsonPath("$.email").value("italo@email.com"))
                 .andExpect(jsonPath("$.password").doesNotExist()); // Garante que a senha não é exposta
     }
@@ -111,7 +103,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.method").value("POST"))
                 
                 // Validação das mensagens específicas de cada campo no Map 'errors'
-                .andExpect(jsonPath("$.errors.username").exists())
+                .andExpect(jsonPath("$.errors.name").exists())
                 .andExpect(jsonPath("$.errors.email").exists())
                 .andExpect(jsonPath("$.errors.password").exists());
     }

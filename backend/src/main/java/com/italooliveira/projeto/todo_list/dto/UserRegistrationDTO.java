@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public record UserRegistrationDTO(
     @NotBlank(message = "O nome de usuário é obrigatório")
-    String username,
+    String name,
 
     @NotBlank(message = "O e-mail é obrigatório")
     @Email(message = "O e-mail deve ser válido")

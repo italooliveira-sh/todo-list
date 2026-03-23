@@ -28,7 +28,7 @@ public class UserService {
             throw new EmailAlreadyExistsException();
         }
 
-        if (userRepository.existsByUsername(dto.username())) {
+        if (userRepository.existsByName(dto.name())) {
             throw new UsernameAlreadyExistsException();
         }
         

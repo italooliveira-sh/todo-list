@@ -46,7 +46,7 @@ class UserServiceTest {
 
         User savedUser = User.builder()
                 .id(UUID.randomUUID())
-                .username(dto.username())
+                .name(dto.name())
                 .email(dto.email())
                 .password(senhaCriptografada)
                 .build();
@@ -58,12 +58,12 @@ class UserServiceTest {
 
         assertNotNull(result);
         assertEquals(dto.email(), result.email());
-        assertEquals(dto.username(), result.username());
+        assertEquals(dto.name(), result.name());
         
         verify(passwordEncoder).encode(dto.password());
         verify(userRepository).save(argThat(user -> 
             user.getPassword().equals(senhaCriptografada) && 
-            user.getUsername().equals(dto.username())
+            user.getName().equals(dto.name())
         ));
     }
 
@@ -88,7 +88,7 @@ class UserServiceTest {
         UserRegistrationDTO dto = new UserRegistrationDTO("italo_duplicado", "outro@email.com", "senha123");
         
         when(userRepository.existsByEmail(dto.email())).thenReturn(false);
-        when(userRepository.existsByUsername(dto.username())).thenReturn(true);
+        when(userRepository.existsByName(dto.name())).thenReturn(true);
 
         RuntimeException exception = assertThrows(UsernameAlreadyExistsException.class, () -> {
             userService.registerUser(dto);
