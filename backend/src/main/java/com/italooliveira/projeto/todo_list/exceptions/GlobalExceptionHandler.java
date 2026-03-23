@@ -26,4 +26,11 @@ public class GlobalExceptionHandler {
                 .status(status)
                 .body(new ApiErrorMessage(request, status, "Campos inválidos", ex.getBindingResult()));
     }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiErrorMessage> handleInvalidCredentials(InvalidCredentialsException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED; 
+        
+        return ResponseEntity.status(status).body(new ApiErrorMessage(request, status, ex.getMessage()));
+    }
 }
