@@ -7,6 +7,8 @@ import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
 import com.italooliveira.projeto.todo_list.mappers.TaskMapper;
 import com.italooliveira.projeto.todo_list.repositories.TaskRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +20,8 @@ public class TaskService {
     private final TaskMapper taskMapper;
 
     @Transactional
-    public TaskResponseDTO createTask(TaskRequestDTO dto, User user) {
+    public TaskResponseDTO createTask(TaskRequestDTO dto) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Task task = taskMapper.toEntity(dto, user);
         Task savedTask = taskRepository.save(task);
         return taskMapper.toResponseDTO(savedTask);
