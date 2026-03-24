@@ -1,7 +1,7 @@
 package com.italooliveira.projeto.todo_list.dto;
 
-import com.italooliveira.projeto.todo_list.enums.Priority;
-import com.italooliveira.projeto.todo_list.enums.TaskStatus;
+import com.italooliveira.projeto.todo_list.domain.enums.Priority;
+import com.italooliveira.projeto.todo_list.domain.enums.TaskStatus;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

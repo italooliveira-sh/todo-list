@@ -1,7 +1,7 @@
 package com.italooliveira.projeto.todo_list.domain;
 
-import com.italooliveira.projeto.todo_list.enums.Priority;
-import com.italooliveira.projeto.todo_list.enums.TaskStatus;
+import com.italooliveira.projeto.todo_list.domain.enums.Priority;
+import com.italooliveira.projeto.todo_list.domain.enums.TaskStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

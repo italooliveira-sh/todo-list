@@ -4,7 +4,7 @@ import com.italooliveira.projeto.todo_list.domain.Task;
 import com.italooliveira.projeto.todo_list.domain.User;
 import com.italooliveira.projeto.todo_list.dto.TaskRequestDTO;
 import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
-import com.italooliveira.projeto.todo_list.enums.TaskStatus;
+import com.italooliveira.projeto.todo_list.domain.enums.TaskStatus;
 import org.springframework.stereotype.Component;
 
 @Component

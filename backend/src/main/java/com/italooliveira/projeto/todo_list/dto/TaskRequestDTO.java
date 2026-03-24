@@ -1,6 +1,6 @@
 package com.italooliveira.projeto.todo_list.dto;
 
-import com.italooliveira.projeto.todo_list.enums.Priority;
+import com.italooliveira.projeto.todo_list.domain.enums.Priority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
