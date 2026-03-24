@@ -38,6 +38,14 @@ class TaskServiceTest {
     @InjectMocks
     private TaskService taskService;
 
+    private void mockSecurityContext(User user) {
+        Authentication auth = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(auth.getPrincipal()).thenReturn(user);
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+    }
+
     @Test
     @DisplayName("Deve criar uma tarefa associada ao usuário autenticado no contexto")
     void shouldCreateTaskSuccessfullyWithAuthenticatedUser() {
@@ -45,12 +53,7 @@ class TaskServiceTest {
         var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
         var request = new TaskRequestDTO("Estudar TDD", "Finalizar módulo de Tasks", Priority.HIGH);
 
-        Authentication auth = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        
-        when(auth.getPrincipal()).thenReturn(user);
-        when(securityContext.getAuthentication()).thenReturn(auth);
-        SecurityContextHolder.setContext(securityContext);
+        mockSecurityContext(user);
 
         when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> {
             Task task = invocation.getArgument(0);
@@ -77,11 +80,7 @@ class TaskServiceTest {
         var task1 = Task.builder().id(UUID.randomUUID()).title("Task 1").user(user).build();
         var task2 = Task.builder().id(UUID.randomUUID()).title("Task 2").user(user).build();
         
-        Authentication auth = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(auth.getPrincipal()).thenReturn(user);
-        when(securityContext.getAuthentication()).thenReturn(auth);
-        SecurityContextHolder.setContext(securityContext);
+        mockSecurityContext(user);
 
         when(taskRepository.findByUserId(user.getId())).thenReturn(List.of(task1, task2));
 
