@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,7 +33,7 @@ class TaskServiceTest {
     private TaskRepository taskRepository;
 
     @Spy
-    private TaskMapper taskMapper = new TaskMapper(); // Usamos Spy para testar a conversão real
+    private TaskMapper taskMapper = new TaskMapper();
 
     @InjectMocks
     private TaskService taskService;
@@ -44,15 +45,13 @@ class TaskServiceTest {
         var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
         var request = new TaskRequestDTO("Estudar TDD", "Finalizar módulo de Tasks", Priority.HIGH);
 
-        // MOCK DO SECURITY CONTEXT (O truque!)
         Authentication auth = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
         
         when(auth.getPrincipal()).thenReturn(user);
         when(securityContext.getAuthentication()).thenReturn(auth);
-        SecurityContextHolder.setContext(securityContext); // "Seta" o usuário como logado
+        SecurityContextHolder.setContext(securityContext);
 
-        // Simula o salvamento
         when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> {
             Task task = invocation.getArgument(0);
             task.setId(UUID.randomUUID());
@@ -60,15 +59,42 @@ class TaskServiceTest {
         });
 
         // Act
-        // Note que agora não passamos mais o 'user' como argumento!
         TaskResponseDTO result = taskService.createTask(request);
 
         // Assert
         assertNotNull(result);
         assertEquals(request.title(), result.title());
-        verify(taskRepository).save(argThat(task -> task.getUser().equals(user))); // Garante que o user foi vinculado
+        verify(taskRepository).save(argThat(task -> task.getUser().equals(user)));
         
-        // Limpa o contexto após o teste (boa prática de DevOps/Testes)
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @DisplayName("Deve listar todas as tarefas do usuário autenticado")
+    void shouldListAllTasksForAuthenticatedUser() {
+        // Arrange
+        var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
+        var task1 = Task.builder().id(UUID.randomUUID()).title("Task 1").user(user).build();
+        var task2 = Task.builder().id(UUID.randomUUID()).title("Task 2").user(user).build();
+        
+        Authentication auth = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(auth.getPrincipal()).thenReturn(user);
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(taskRepository.findByUserId(user.getId())).thenReturn(List.of(task1, task2));
+
+        // Act
+        List<TaskResponseDTO> result = taskService.findAllTasks();
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("Task 1", result.get(0).title());
+        assertEquals("Task 2", result.get(1).title());
+        
+        verify(taskRepository).findByUserId(user.getId());
         SecurityContextHolder.clearContext();
     }
 }
