@@ -33,6 +33,20 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
+    public TaskResponseDTO findTaskById(UUID id) {
+        User user = getAuthenticatedUser();
+
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+
+        if (!task.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenActionException();
+        }
+
+        return taskMapper.toResponseDTO(task);
+    }
+
+    @Transactional(readOnly = true)
     public List<TaskResponseDTO> findAllTasks() {
         User user = getAuthenticatedUser();
         return taskRepository.findByUserId(user.getId()).stream()

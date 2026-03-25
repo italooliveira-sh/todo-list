@@ -76,6 +76,77 @@ class TaskServiceTest {
     }
 
     @Test
+    @DisplayName("Deve buscar uma tarefa por ID com sucesso se o usuário for o dono")
+    void shouldFindTaskByIdSuccessfullyWhenUserIsOwner() {
+        // Arrange
+        var taskId = UUID.randomUUID();
+        var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
+        var task = Task.builder()
+                .id(taskId)
+                .title("Estudar Spring Security")
+                .user(user)
+                .build();
+
+        mockSecurityContext(user);
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
+
+        // Act
+        TaskResponseDTO result = taskService.findTaskById(taskId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Estudar Spring Security", result.title());
+        verify(taskRepository).findById(taskId);
+        
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @DisplayName("Deve lançar ResourceNotFoundException ao buscar tarefa inexistente")
+    void shouldThrowResourceNotFoundExceptionWhenFindingNonExistentTask() {
+        // Arrange
+        var idInexistente = UUID.randomUUID();
+        var user = User.builder().id(UUID.randomUUID()).build();
+
+        mockSecurityContext(user);
+
+        // Simulamos que o repository retorna VAZIO para esse ID
+        when(taskRepository.findById(idInexistente)).thenReturn(java.util.Optional.empty());
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            taskService.findTaskById(idInexistente);
+        });
+
+        // Verificamos que o fluxo parou na busca e não tentou processar mais nada
+        verify(taskRepository).findById(idInexistente);
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @DisplayName("Deve lançar ForbiddenActionException ao buscar tarefa de outro usuário")
+    void shouldThrowForbiddenExceptionWhenFindingTaskFromAnotherUser() {
+        // Arrange
+        var taskId = UUID.randomUUID();
+        var donoOriginal = User.builder().id(UUID.randomUUID()).build();
+        var invasor = User.builder().id(UUID.randomUUID()).build();
+        
+        var taskDoDono = Task.builder().id(taskId).user(donoOriginal).build();
+
+        mockSecurityContext(invasor);
+
+        when(taskRepository.findById(taskId)).thenReturn(java.util.Optional.of(taskDoDono));
+
+        // Act & Assert
+        assertThrows(ForbiddenActionException.class, () -> {
+            taskService.findTaskById(taskId);
+        });
+
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
     @DisplayName("Deve listar todas as tarefas do usuário autenticado")
     void shouldListAllTasksForAuthenticatedUser() {
         // Arrange
