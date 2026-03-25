@@ -1,7 +1,9 @@
 package com.italooliveira.projeto.todo_list.exceptions;
 
+import org.springframework.http.HttpStatus;
+
 public class InvalidCredentialsException extends BusinessException {
     public InvalidCredentialsException() {
-        super("E-mail ou senha incorretos.");
+        super("Credenciais inválidas", HttpStatus.UNAUTHORIZED);
     }
 }
