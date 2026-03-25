@@ -35,14 +35,9 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskResponseDTO findTaskById(UUID id) {
         User user = getAuthenticatedUser();
-
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
-
-        if (!task.getUser().getId().equals(user.getId())) {
-            throw new ForbiddenActionException();
-        }
-
+        Task task = findByIdOrThrow(id);
+        validateOwnership(task, user);
+        
         return taskMapper.toResponseDTO(task);
     }
 
@@ -55,35 +50,35 @@ public class TaskService {
 
     @Transactional
     public TaskResponseDTO updateTask(UUID id, TaskRequestDTO dto) {
-        User currentUser = getAuthenticatedUser();
-
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
-
-        if (!task.getUser().getId().equals(currentUser.getId())) {
-            throw new ForbiddenActionException();
-        }
+        User user = getAuthenticatedUser();
+        Task task = findByIdOrThrow(id);
+        validateOwnership(task, user);
 
         task.setTitle(dto.title());
         task.setDescription(dto.description());
         task.setPriority(dto.priority());
 
-        // O save() é implícito aqui pelo Dirty Checking do Hibernate ao final da transação
         return taskMapper.toResponseDTO(task);
     }
 
     @Transactional
     public void deleteTask(UUID id) {
         User user = getAuthenticatedUser();
+        Task task = findByIdOrThrow(id);
+        validateOwnership(task, user);
+        
+        taskRepository.delete(task);
+    }
 
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com o ID: " + id));
+    private Task findByIdOrThrow(UUID id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+    }
 
+    private void validateOwnership(Task task, User user) {
         if (!task.getUser().getId().equals(user.getId())) {
             throw new ForbiddenActionException();
         }
-
-        taskRepository.delete(task);
     }
 
     private User getAuthenticatedUser() {
