@@ -26,39 +26,39 @@ public class TaskService {
 
     @Transactional
     public TaskResponseDTO createTask(TaskRequestDTO dto) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = getAuthenticatedUser();
         Task task = taskMapper.toEntity(dto, user);
-        Task savedTask = taskRepository.save(task);
-        return taskMapper.toResponseDTO(savedTask);
+        taskRepository.save(task);
+        return taskMapper.toResponseDTO(task);
     }
 
+    @Transactional(readOnly = true)
     public List<TaskResponseDTO> findAllTasks() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = getAuthenticatedUser();
         return taskRepository.findByUserId(user.getId()).stream()
                 .map(taskMapper::toResponseDTO).toList();
     }
 
     @Transactional
     public TaskResponseDTO updateTask(UUID id, TaskRequestDTO dto) {
-        // 1. Recupera o usuário logado do contexto de segurança
-        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentUser = getAuthenticatedUser();
 
-        // 2. Busca a tarefa existente ou lança exceção se não encontrar
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
 
-        // 3. Validação de segurança: verifica se o usuário logado é o dono da tarefa
         if (!task.getUser().getId().equals(currentUser.getId())) {
             throw new ForbiddenActionException();
         }
 
-        // 4. Atualiza os campos da entidade com os dados do DTO
         task.setTitle(dto.title());
         task.setDescription(dto.description());
         task.setPriority(dto.priority());
 
-        // 5. Salva e retorna o DTO de resposta mapeado
-        return taskMapper.toResponseDTO(taskRepository.save(task));
+        // O save() é implícito aqui pelo Dirty Checking do Hibernate ao final da transação
+        return taskMapper.toResponseDTO(task);
     }
 
+    private User getAuthenticatedUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 }

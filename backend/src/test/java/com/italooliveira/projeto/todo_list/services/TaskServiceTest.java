@@ -107,7 +107,6 @@ class TaskServiceTest {
         var taskId = UUID.randomUUID();
         var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
         
-        // A tarefa já existe no banco e pertence ao "italo"
         var existingTask = Task.builder()
                 .id(taskId)
                 .title("Título Antigo")
@@ -120,8 +119,7 @@ class TaskServiceTest {
 
         mockSecurityContext(user);
 
-        when(taskRepository.findById(taskId)).thenReturn(java.util.Optional.of(existingTask));
-        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(existingTask));
 
         // Act
         TaskResponseDTO result = taskService.updateTask(taskId, updateRequest);
@@ -129,12 +127,13 @@ class TaskServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("Novo Título", result.title());
+        assertEquals("Nova Descrição", result.description());
         assertEquals(Priority.MEDIUM, result.priority());
-        verify(taskRepository).save(argThat(task -> 
-            task.getTitle().equals("Novo Título") && 
-            task.getUser().getId().equals(user.getId())
-        ));
         
+        // Verificamos se o objeto 'existingTask' (em memória/mock) foi de fato alterado
+        assertEquals("Novo Título", existingTask.getTitle());
+        assertEquals(Priority.MEDIUM, existingTask.getPriority());
+
         SecurityContextHolder.clearContext();
     }
 
