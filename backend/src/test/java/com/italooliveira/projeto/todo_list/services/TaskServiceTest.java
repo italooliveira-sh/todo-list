@@ -253,4 +253,68 @@ class TaskServiceTest {
         verify(taskRepository, never()).save(any());
         SecurityContextHolder.clearContext();
     }
+
+    @Test
+    @DisplayName("Deve deletar uma tarefa com sucesso se o usuário for o dono")
+    void shouldDeleteTaskSuccessfullyWhenUserIsOwner() {
+        // Arrange
+        var taskId = UUID.randomUUID();
+        var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
+        var task = Task.builder().id(taskId).user(user).build();
+
+        mockSecurityContext(user);
+
+        when(taskRepository.findById(taskId)).thenReturn(java.util.Optional.of(task));
+
+        // Act
+        taskService.deleteTask(taskId);
+
+        // Assert
+        verify(taskRepository).delete(task); // Garante que o repository foi chamado
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @DisplayName("Deve lançar ForbiddenActionException ao tentar DELETAR tarefa de outro utilizador")
+    void shouldThrowForbiddenExceptionWhenDeletingTaskFromAnotherUser() {
+        // Arrange
+        var taskId = UUID.randomUUID();
+        var donoOriginal = User.builder().id(UUID.randomUUID()).email("dono@email.com").build();
+        var invasor = User.builder().id(UUID.randomUUID()).email("invasor@email.com").build();
+        
+        var taskDoDono = Task.builder().id(taskId).user(donoOriginal).build();
+
+        mockSecurityContext(invasor); // Simulamos o invasor logado
+
+        when(taskRepository.findById(taskId)).thenReturn(java.util.Optional.of(taskDoDono));
+
+        // Act & Assert
+        assertThrows(ForbiddenActionException.class, () -> {
+            taskService.deleteTask(taskId);
+        });
+
+        // Garante que o delete NUNCA foi chamado no repository
+        verify(taskRepository, never()).delete(any());
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @DisplayName("Deve lançar ResourceNotFoundException ao tentar DELETAR tarefa inexistente")
+    void shouldThrowResourceNotFoundExceptionWhenDeletingNonExistentTask() {
+        // Arrange
+        var idInexistente = UUID.randomUUID();
+        var user = User.builder().id(UUID.randomUUID()).build();
+
+        mockSecurityContext(user);
+
+        when(taskRepository.findById(idInexistente)).thenReturn(java.util.Optional.empty());
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            taskService.deleteTask(idInexistente);
+        });
+
+        verify(taskRepository, never()).delete(any());
+        SecurityContextHolder.clearContext();
+    }
 }

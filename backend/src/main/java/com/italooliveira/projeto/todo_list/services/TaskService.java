@@ -72,6 +72,20 @@ public class TaskService {
         return taskMapper.toResponseDTO(task);
     }
 
+    @Transactional
+    public void deleteTask(UUID id) {
+        User user = getAuthenticatedUser();
+
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com o ID: " + id));
+
+        if (!task.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenActionException();
+        }
+
+        taskRepository.delete(task);
+    }
+
     private User getAuthenticatedUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
