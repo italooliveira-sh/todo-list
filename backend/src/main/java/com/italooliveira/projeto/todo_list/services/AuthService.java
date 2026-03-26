@@ -1,30 +1,30 @@
 package com.italooliveira.projeto.todo_list.services;
 
+import com.italooliveira.projeto.todo_list.domain.User;
 import com.italooliveira.projeto.todo_list.dto.LoginRequestDTO;
 import com.italooliveira.projeto.todo_list.dto.LoginResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.InvalidCredentialsException;
-import com.italooliveira.projeto.todo_list.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
 
     public LoginResponseDTO login(LoginRequestDTO data) {
-        var user = userRepository.findByEmail(data.email())
-                .orElseThrow(() -> new InvalidCredentialsException());
+        try {
+            var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
+            var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        if (!passwordEncoder.matches(data.password(), user.getPassword())) {
+            String token = tokenService.generateToken((User) auth.getPrincipal());
+            return new LoginResponseDTO(token);
+        } catch (Exception e) {
             throw new InvalidCredentialsException();
         }
-
-        String token = tokenService.generateToken(user);
-        return new LoginResponseDTO(token);
     }
 }
