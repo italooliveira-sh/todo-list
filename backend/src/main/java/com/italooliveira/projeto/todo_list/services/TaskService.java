@@ -7,6 +7,7 @@ import com.italooliveira.projeto.todo_list.dto.TaskRequestDTO;
 import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.ForbiddenActionException;
 import com.italooliveira.projeto.todo_list.exceptions.ResourceNotFoundException;
+import com.italooliveira.projeto.todo_list.exceptions.TaskAlreadyStartedException;
 import com.italooliveira.projeto.todo_list.mappers.TaskMapper;
 import com.italooliveira.projeto.todo_list.repositories.TaskRepository;
 import lombok.RequiredArgsConstructor;
@@ -78,6 +79,21 @@ public class TaskService {
         Task task = findByIdOrThrow(id);
         validateOwnership(task, currentUser);
         task.setStatus(TaskStatus.DONE);
+
+        return taskMapper.toResponseDTO(task);
+    }
+
+    @Transactional
+    public TaskResponseDTO startTask(UUID id) {
+        User currentUser = getAuthenticatedUser();
+        Task task = findByIdOrThrow(id);
+        validateOwnership(task, currentUser);
+
+        if (task.getStatus() != TaskStatus.PENDING) {
+            throw new TaskAlreadyStartedException();
+        }
+
+        task.setStatus(TaskStatus.DOING);
 
         return taskMapper.toResponseDTO(task);
     }
