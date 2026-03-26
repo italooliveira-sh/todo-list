@@ -2,6 +2,7 @@ package com.italooliveira.projeto.todo_list.services;
 
 import com.italooliveira.projeto.todo_list.domain.Task;
 import com.italooliveira.projeto.todo_list.domain.User;
+import com.italooliveira.projeto.todo_list.domain.enums.TaskStatus;
 import com.italooliveira.projeto.todo_list.dto.TaskRequestDTO;
 import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.ForbiddenActionException;
@@ -57,6 +58,7 @@ public class TaskService {
         task.setTitle(dto.title());
         task.setDescription(dto.description());
         task.setPriority(dto.priority());
+        task.setDeadline(dto.deadline());
 
         return taskMapper.toResponseDTO(task);
     }
@@ -68,6 +70,16 @@ public class TaskService {
         validateOwnership(task, user);
         
         taskRepository.delete(task);
+    }
+
+    @Transactional
+    public TaskResponseDTO completeTask(UUID id) {
+        User currentUser = getAuthenticatedUser();
+        Task task = findByIdOrThrow(id);
+        validateOwnership(task, currentUser);
+        task.setStatus(TaskStatus.DONE);
+
+        return taskMapper.toResponseDTO(taskRepository.save(task));
     }
 
     private Task findByIdOrThrow(UUID id) {

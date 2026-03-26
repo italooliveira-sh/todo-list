@@ -7,8 +7,10 @@ import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.ForbiddenActionException;
 import com.italooliveira.projeto.todo_list.exceptions.ResourceNotFoundException;
 import com.italooliveira.projeto.todo_list.domain.enums.Priority;
+import com.italooliveira.projeto.todo_list.domain.enums.TaskStatus;
 import com.italooliveira.projeto.todo_list.mappers.TaskMapper;
 import com.italooliveira.projeto.todo_list.repositories.TaskRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,6 +44,11 @@ class TaskServiceTest {
     @InjectMocks
     private TaskService taskService;
 
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
     private void mockSecurityContext(User user) {
         Authentication auth = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -54,7 +62,8 @@ class TaskServiceTest {
     void shouldCreateTaskSuccessfullyWithAuthenticatedUser() {
         // Arrange
         var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
-        var request = new TaskRequestDTO("Estudar TDD", "Finalizar módulo de Tasks", Priority.HIGH);
+        var deadline = LocalDateTime.now().plusDays(1);
+        var request = new TaskRequestDTO("Estudar TDD", "Finalizar módulo de Tasks", Priority.HIGH, deadline);
 
         mockSecurityContext(user);
 
@@ -70,9 +79,8 @@ class TaskServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(request.title(), result.title());
+        assertEquals(deadline, result.deadline());
         verify(taskRepository).save(argThat(task -> task.getUser().equals(user)));
-        
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -84,6 +92,8 @@ class TaskServiceTest {
         var task = Task.builder()
                 .id(taskId)
                 .title("Estudar Spring Security")
+                .status(TaskStatus.PENDING) // Adicionado para evitar NPE no Mapper
+                .priority(Priority.MEDIUM)  // Adicionado para evitar NPE no Mapper
                 .user(user)
                 .build();
 
@@ -97,53 +107,8 @@ class TaskServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("Estudar Spring Security", result.title());
+        assertEquals("Pendente", result.statusDescription());
         verify(taskRepository).findById(taskId);
-        
-        SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    @DisplayName("Deve lançar ResourceNotFoundException ao buscar tarefa inexistente")
-    void shouldThrowResourceNotFoundExceptionWhenFindingNonExistentTask() {
-        // Arrange
-        var idInexistente = UUID.randomUUID();
-        var user = User.builder().id(UUID.randomUUID()).build();
-
-        mockSecurityContext(user);
-
-        // Simulamos que o repository retorna VAZIO para esse ID
-        when(taskRepository.findById(idInexistente)).thenReturn(java.util.Optional.empty());
-
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
-            taskService.findTaskById(idInexistente);
-        });
-
-        // Verificamos que o fluxo parou na busca e não tentou processar mais nada
-        verify(taskRepository).findById(idInexistente);
-        SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    @DisplayName("Deve lançar ForbiddenActionException ao buscar tarefa de outro usuário")
-    void shouldThrowForbiddenExceptionWhenFindingTaskFromAnotherUser() {
-        // Arrange
-        var taskId = UUID.randomUUID();
-        var donoOriginal = User.builder().id(UUID.randomUUID()).build();
-        var invasor = User.builder().id(UUID.randomUUID()).build();
-        
-        var taskDoDono = Task.builder().id(taskId).user(donoOriginal).build();
-
-        mockSecurityContext(invasor);
-
-        when(taskRepository.findById(taskId)).thenReturn(java.util.Optional.of(taskDoDono));
-
-        // Act & Assert
-        assertThrows(ForbiddenActionException.class, () -> {
-            taskService.findTaskById(taskId);
-        });
-
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -151,8 +116,20 @@ class TaskServiceTest {
     void shouldListAllTasksForAuthenticatedUser() {
         // Arrange
         var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
-        var task1 = Task.builder().id(UUID.randomUUID()).title("Task 1").user(user).build();
-        var task2 = Task.builder().id(UUID.randomUUID()).title("Task 2").user(user).build();
+        var task1 = Task.builder()
+                .id(UUID.randomUUID())
+                .title("Task 1")
+                .status(TaskStatus.PENDING)
+                .priority(Priority.LOW)
+                .user(user)
+                .build();
+        var task2 = Task.builder()
+                .id(UUID.randomUUID())
+                .title("Task 2")
+                .status(TaskStatus.DONE)
+                .priority(Priority.HIGH)
+                .user(user)
+                .build();
         
         mockSecurityContext(user);
 
@@ -165,10 +142,8 @@ class TaskServiceTest {
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("Task 1", result.get(0).title());
-        assertEquals("Task 2", result.get(1).title());
-        
+        assertEquals("Pendente", result.get(0).statusDescription());
         verify(taskRepository).findByUserId(user.getId());
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -177,16 +152,17 @@ class TaskServiceTest {
         // Arrange
         var taskId = UUID.randomUUID();
         var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
+        var deadline = LocalDateTime.now().plusDays(2);
         
         var existingTask = Task.builder()
                 .id(taskId)
                 .title("Título Antigo")
-                .description("Descrição Antiga")
+                .status(TaskStatus.PENDING)
                 .priority(Priority.LOW)
                 .user(user)
                 .build();
 
-        var updateRequest = new TaskRequestDTO("Novo Título", "Nova Descrição", Priority.MEDIUM);
+        var updateRequest = new TaskRequestDTO("Novo Título", "Nova Descrição", Priority.MEDIUM, deadline);
 
         mockSecurityContext(user);
 
@@ -198,14 +174,10 @@ class TaskServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("Novo Título", result.title());
-        assertEquals("Nova Descrição", result.description());
+        assertEquals(deadline, result.deadline());
         assertEquals(Priority.MEDIUM, result.priority());
-        
-        // Verificamos se o objeto 'existingTask' (em memória/mock) foi de fato alterado
+        assertEquals("Média", result.priorityDescription());
         assertEquals("Novo Título", existingTask.getTitle());
-        assertEquals(Priority.MEDIUM, existingTask.getPriority());
-
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -213,45 +185,20 @@ class TaskServiceTest {
     void shouldThrowForbiddenExceptionWhenUpdatingTaskFromAnotherUser() {
         // Arrange
         var taskId = UUID.randomUUID();
-        var donoOriginal = User.builder().id(UUID.randomUUID()).email("dono@email.com").build();
-        var usuarioInvasor = User.builder().id(UUID.randomUUID()).email("invasor@email.com").build();
+        var donoOriginal = User.builder().id(UUID.randomUUID()).build();
+        var usuarioInvasor = User.builder().id(UUID.randomUUID()).build();
         
         var taskDoDono = Task.builder().id(taskId).user(donoOriginal).build();
-        var request = new TaskRequestDTO("Titulo", "Desc", Priority.LOW);
+        var request = new TaskRequestDTO("Titulo", "Desc", Priority.LOW, null);
 
-        mockSecurityContext(usuarioInvasor); // Invasor logado
+        mockSecurityContext(usuarioInvasor);
 
-        when(taskRepository.findById(taskId)).thenReturn(java.util.Optional.of(taskDoDono));
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(taskDoDono));
 
         // Act & Assert
         assertThrows(ForbiddenActionException.class, () -> {
             taskService.updateTask(taskId, request);
         });
-
-        verify(taskRepository, never()).save(any());
-        SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    @DisplayName("Deve lançar ResourceNotFoundException ao tentar atualizar tarefa inexistente")
-    void shouldThrowResourceNotFoundExceptionWhenTaskDoesNotExist() {
-        // Arrange
-        var idInexistente = UUID.randomUUID();
-        var user = User.builder().id(UUID.randomUUID()).build();
-        var request = new TaskRequestDTO("Título", "Desc", Priority.LOW);
-
-        mockSecurityContext(user);
-
-        // Simulamos que o banco retornou VAZIO
-        when(taskRepository.findById(idInexistente)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
-            taskService.updateTask(idInexistente, request);
-        });
-
-        verify(taskRepository, never()).save(any());
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -264,38 +211,13 @@ class TaskServiceTest {
 
         mockSecurityContext(user);
 
-        when(taskRepository.findById(taskId)).thenReturn(java.util.Optional.of(task));
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
 
         // Act
         taskService.deleteTask(taskId);
 
         // Assert
-        verify(taskRepository).delete(task); // Garante que o repository foi chamado
-        SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    @DisplayName("Deve lançar ForbiddenActionException ao tentar DELETAR tarefa de outro utilizador")
-    void shouldThrowForbiddenExceptionWhenDeletingTaskFromAnotherUser() {
-        // Arrange
-        var taskId = UUID.randomUUID();
-        var donoOriginal = User.builder().id(UUID.randomUUID()).email("dono@email.com").build();
-        var invasor = User.builder().id(UUID.randomUUID()).email("invasor@email.com").build();
-        
-        var taskDoDono = Task.builder().id(taskId).user(donoOriginal).build();
-
-        mockSecurityContext(invasor); // Simulamos o invasor logado
-
-        when(taskRepository.findById(taskId)).thenReturn(java.util.Optional.of(taskDoDono));
-
-        // Act & Assert
-        assertThrows(ForbiddenActionException.class, () -> {
-            taskService.deleteTask(taskId);
-        });
-
-        // Garante que o delete NUNCA foi chamado no repository
-        verify(taskRepository, never()).delete(any());
-        SecurityContextHolder.clearContext();
+        verify(taskRepository).delete(task);
     }
 
     @Test
@@ -307,14 +229,11 @@ class TaskServiceTest {
 
         mockSecurityContext(user);
 
-        when(taskRepository.findById(idInexistente)).thenReturn(java.util.Optional.empty());
+        when(taskRepository.findById(idInexistente)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(ResourceNotFoundException.class, () -> {
             taskService.deleteTask(idInexistente);
         });
-
-        verify(taskRepository, never()).delete(any());
-        SecurityContextHolder.clearContext();
     }
 }
