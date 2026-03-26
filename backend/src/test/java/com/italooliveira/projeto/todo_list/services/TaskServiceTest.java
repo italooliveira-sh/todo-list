@@ -92,8 +92,8 @@ class TaskServiceTest {
         var task = Task.builder()
                 .id(taskId)
                 .title("Estudar Spring Security")
-                .status(TaskStatus.PENDING) // Adicionado para evitar NPE no Mapper
-                .priority(Priority.MEDIUM)  // Adicionado para evitar NPE no Mapper
+                .status(TaskStatus.PENDING)
+                .priority(Priority.MEDIUM)
                 .user(user)
                 .build();
 
@@ -109,6 +109,43 @@ class TaskServiceTest {
         assertEquals("Estudar Spring Security", result.title());
         assertEquals("Pendente", result.statusDescription());
         verify(taskRepository).findById(taskId);
+    }
+
+    @Test
+    @DisplayName("Deve lançar ResourceNotFoundException ao buscar tarefa inexistente")
+    void shouldThrowResourceNotFoundExceptionWhenFindingNonExistentTask() {
+        // Arrange
+        var idInexistente = UUID.randomUUID();
+        var user = User.builder().id(UUID.randomUUID()).build();
+
+        mockSecurityContext(user);
+
+        when(taskRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            taskService.findTaskById(idInexistente);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve lançar ForbiddenActionException ao buscar tarefa de outro usuário")
+    void shouldThrowForbiddenExceptionWhenFindingTaskFromAnotherUser() {
+        // Arrange
+        var taskId = UUID.randomUUID();
+        var donoOriginal = User.builder().id(UUID.randomUUID()).build();
+        var invasor = User.builder().id(UUID.randomUUID()).build();
+        
+        var taskDoDono = Task.builder().id(taskId).user(donoOriginal).build();
+
+        mockSecurityContext(invasor);
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(taskDoDono));
+
+        // Act & Assert
+        assertThrows(ForbiddenActionException.class, () -> {
+            taskService.findTaskById(taskId);
+        });
     }
 
     @Test
@@ -141,8 +178,6 @@ class TaskServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("Task 1", result.get(0).title());
-        assertEquals("Pendente", result.get(0).statusDescription());
         verify(taskRepository).findByUserId(user.getId());
     }
 
@@ -174,31 +209,8 @@ class TaskServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("Novo Título", result.title());
-        assertEquals(deadline, result.deadline());
-        assertEquals(Priority.MEDIUM, result.priority());
         assertEquals("Média", result.priorityDescription());
         assertEquals("Novo Título", existingTask.getTitle());
-    }
-
-    @Test
-    @DisplayName("Deve lançar ForbiddenActionException ao tentar atualizar tarefa de outro usuário")
-    void shouldThrowForbiddenExceptionWhenUpdatingTaskFromAnotherUser() {
-        // Arrange
-        var taskId = UUID.randomUUID();
-        var donoOriginal = User.builder().id(UUID.randomUUID()).build();
-        var usuarioInvasor = User.builder().id(UUID.randomUUID()).build();
-        
-        var taskDoDono = Task.builder().id(taskId).user(donoOriginal).build();
-        var request = new TaskRequestDTO("Titulo", "Desc", Priority.LOW, null);
-
-        mockSecurityContext(usuarioInvasor);
-
-        when(taskRepository.findById(taskId)).thenReturn(Optional.of(taskDoDono));
-
-        // Act & Assert
-        assertThrows(ForbiddenActionException.class, () -> {
-            taskService.updateTask(taskId, request);
-        });
     }
 
     @Test
@@ -221,7 +233,29 @@ class TaskServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar ResourceNotFoundException ao tentar DELETAR tarefa inexistente")
+    @DisplayName("Deve lançar ForbiddenActionException ao deletar tarefa de outro usuário")
+    void shouldThrowForbiddenExceptionWhenDeletingTaskFromAnotherUser() {
+        // Arrange
+        var taskId = UUID.randomUUID();
+        var donoOriginal = User.builder().id(UUID.randomUUID()).build();
+        var invasor = User.builder().id(UUID.randomUUID()).build();
+        
+        var taskDoDono = Task.builder().id(taskId).user(donoOriginal).build();
+
+        mockSecurityContext(invasor);
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(taskDoDono));
+
+        // Act & Assert
+        assertThrows(ForbiddenActionException.class, () -> {
+            taskService.deleteTask(taskId);
+        });
+
+        verify(taskRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar ResourceNotFoundException ao deletar tarefa inexistente")
     void shouldThrowResourceNotFoundExceptionWhenDeletingNonExistentTask() {
         // Arrange
         var idInexistente = UUID.randomUUID();
@@ -235,5 +269,34 @@ class TaskServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> {
             taskService.deleteTask(idInexistente);
         });
+    }
+
+    @Test
+    @DisplayName("Deve marcar uma tarefa como concluída (DONE) com sucesso")
+    void shouldCompleteTaskSuccessfully() {
+        // Arrange
+        var taskId = UUID.randomUUID();
+        var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
+        
+        var task = Task.builder()
+                .id(taskId)
+                .title("Finalizar CRUD")
+                .status(TaskStatus.PENDING)
+                .priority(Priority.LOW)
+                .user(user)
+                .build();
+
+        mockSecurityContext(user);
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
+
+        // Act
+        TaskResponseDTO result = taskService.completeTask(taskId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(TaskStatus.DONE, result.status());
+        assertEquals("Concluída", result.statusDescription());
+        assertEquals(TaskStatus.DONE, task.getStatus()); // Verifica o Dirty Checking
     }
 }

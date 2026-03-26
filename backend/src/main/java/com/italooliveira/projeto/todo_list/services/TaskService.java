@@ -79,7 +79,7 @@ public class TaskService {
         validateOwnership(task, currentUser);
         task.setStatus(TaskStatus.DONE);
 
-        return taskMapper.toResponseDTO(taskRepository.save(task));
+        return taskMapper.toResponseDTO(task);
     }
 
     private Task findByIdOrThrow(UUID id) {
