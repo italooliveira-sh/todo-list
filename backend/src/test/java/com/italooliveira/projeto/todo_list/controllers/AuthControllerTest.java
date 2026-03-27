@@ -54,7 +54,7 @@ class AuthControllerTest extends BaseControllerTest{
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 // Validando se o JSON de erro tem o campo que você definiu no ApiErrorMessage
-                .andExpect(jsonPath("$.message").value("E-mail ou senha incorretos."))
+                .andExpect(jsonPath("$.message").value("Credenciais inválidas"))
                 .andExpect(jsonPath("$.status").value(401));
     }
 }
