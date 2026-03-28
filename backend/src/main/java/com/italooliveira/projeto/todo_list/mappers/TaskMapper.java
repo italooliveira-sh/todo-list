@@ -5,14 +5,16 @@ import com.italooliveira.projeto.todo_list.domain.User;
 import com.italooliveira.projeto.todo_list.domain.enums.TaskStatus;
 import com.italooliveira.projeto.todo_list.dto.TaskRequestDTO;
 import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class TaskMapper {
 
-    public Task toEntity(TaskRequestDTO dto, User user) {
-        if (dto == null) return null;
+    private final CategoryMapper categoryMapper;
 
+    public Task toEntity(TaskRequestDTO dto, User user) {
         return Task.builder()
                 .title(dto.title())
                 .description(dto.description())
@@ -24,7 +26,7 @@ public class TaskMapper {
     }
 
     public TaskResponseDTO toResponseDTO(Task task) {
-        if (task == null) return null;
+        var categoryDTO = task.getCategory() != null ? categoryMapper.toResponseDTO(task.getCategory()) : null;
 
         return new TaskResponseDTO(
                 task.getId(),
@@ -35,6 +37,7 @@ public class TaskMapper {
                 task.getPriority(),
                 task.getPriority().getDescription(),
                 task.getDeadline(),
+                categoryDTO,
                 task.getCreatedAt(),
                 task.getUpdatedAt()
         );

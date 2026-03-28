@@ -16,6 +16,7 @@ public record TaskResponseDTO(
     Priority priority,
     String priorityDescription,
     LocalDateTime deadline,
+    CategoryResponseDTO category,
     OffsetDateTime createdAt,
     OffsetDateTime updatedAt
 ) {}

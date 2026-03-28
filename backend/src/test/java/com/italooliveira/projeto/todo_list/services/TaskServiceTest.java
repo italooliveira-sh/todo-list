@@ -2,6 +2,7 @@ package com.italooliveira.projeto.todo_list.services;
 
 import com.italooliveira.projeto.todo_list.domain.Task;
 import com.italooliveira.projeto.todo_list.domain.User;
+import com.italooliveira.projeto.todo_list.domain.Category;
 import com.italooliveira.projeto.todo_list.dto.TaskRequestDTO;
 import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.ForbiddenActionException;
@@ -9,6 +10,7 @@ import com.italooliveira.projeto.todo_list.exceptions.ResourceNotFoundException;
 import com.italooliveira.projeto.todo_list.exceptions.TaskAlreadyStartedException;
 import com.italooliveira.projeto.todo_list.domain.enums.Priority;
 import com.italooliveira.projeto.todo_list.domain.enums.TaskStatus;
+import com.italooliveira.projeto.todo_list.mappers.CategoryMapper;
 import com.italooliveira.projeto.todo_list.mappers.TaskMapper;
 import com.italooliveira.projeto.todo_list.repositories.TaskRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -39,8 +41,11 @@ class TaskServiceTest {
     @Mock
     private TaskRepository taskRepository;
 
-    @Spy
-    private TaskMapper taskMapper = new TaskMapper();
+    @Mock
+    private CategoryService categoryService;
+
+    private CategoryMapper categoryMapper;
+    private TaskMapper taskMapper;
 
     @InjectMocks
     private TaskService taskService;
@@ -48,6 +53,14 @@ class TaskServiceTest {
     @AfterEach
     void tearDown() {
         SecurityContextHolder.clearContext();
+    }
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        categoryMapper = new CategoryMapper(taskRepository);
+        taskMapper = new TaskMapper(categoryMapper);
+        // Garantindo que o taskService use o taskMapper real com o categoryMapper real
+        taskService = new TaskService(taskRepository, categoryService, taskMapper);
     }
 
     private void mockSecurityContext(User user) {
@@ -64,7 +77,7 @@ class TaskServiceTest {
         // Arrange
         var user = User.builder().id(UUID.randomUUID()).email("italo@email.com").build();
         var deadline = LocalDateTime.now().plusDays(1);
-        var request = new TaskRequestDTO("Estudar TDD", "Finalizar módulo de Tasks", Priority.HIGH, deadline);
+        var request = new TaskRequestDTO("Estudar TDD", "Finalizar módulo de Tasks", Priority.HIGH, deadline, null);
 
         mockSecurityContext(user);
 
@@ -198,7 +211,7 @@ class TaskServiceTest {
                 .user(user)
                 .build();
 
-        var updateRequest = new TaskRequestDTO("Novo Título", "Nova Descrição", Priority.MEDIUM, deadline);
+        var updateRequest = new TaskRequestDTO("Novo Título", "Nova Descrição", Priority.MEDIUM, deadline, null);
 
         mockSecurityContext(user);
 
@@ -338,5 +351,46 @@ class TaskServiceTest {
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
 
         assertThrows(TaskAlreadyStartedException.class, () -> taskService.startTask(taskId));
+    }
+
+    @Test
+    @DisplayName("Deve criar uma tarefa com uma categoria válida")
+    void shouldCreateTaskWithCategorySuccessfully() {
+        // Arrange
+        var user = User.builder().id(UUID.randomUUID()).build();
+        var categoryId = UUID.randomUUID();
+        var category = Category.builder().id(categoryId).name("Trabalho").user(user).build();
+        var request = new TaskRequestDTO("Task com Categoria", "Desc", Priority.MEDIUM, null, categoryId);
+
+        mockSecurityContext(user);
+        when(categoryService.findByIdOrThrow(categoryId)).thenReturn(category);
+        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        TaskResponseDTO result = taskService.createTask(request);
+
+        // Assert
+        assertNotNull(result);
+        assertNotNull(result.category());
+        assertEquals("Trabalho", result.category().name());
+        verify(categoryService).findByIdOrThrow(categoryId);
+    }
+
+    @Test
+    @DisplayName("Deve lançar ForbiddenActionException ao usar categoria de outro usuário")
+    void shouldThrowForbiddenExceptionWhenUsingCategoryFromAnotherUser() {
+        // Arrange
+        var user = User.builder().id(UUID.randomUUID()).build();
+        var otherUser = User.builder().id(UUID.randomUUID()).build();
+        var categoryId = UUID.randomUUID();
+        var category = Category.builder().id(categoryId).name("Categoria Alheia").user(otherUser).build();
+        var request = new TaskRequestDTO("Task Maliciosa", "Desc", Priority.MEDIUM, null, categoryId);
+
+        mockSecurityContext(user);
+        when(categoryService.findByIdOrThrow(categoryId)).thenReturn(category);
+
+        // Act & Assert
+        assertThrows(ForbiddenActionException.class, () -> taskService.createTask(request));
+        verify(taskRepository, never()).save(any());
     }
 }

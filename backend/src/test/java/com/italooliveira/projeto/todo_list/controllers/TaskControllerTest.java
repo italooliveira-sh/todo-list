@@ -49,7 +49,8 @@ public class TaskControllerTest extends BaseControllerTest{
             "Finalizar API", 
             "Implementar testes de controller", 
             Priority.HIGH,
-            deadline
+            deadline,
+            null
         );
 
         var response = new TaskResponseDTO(
@@ -61,6 +62,7 @@ public class TaskControllerTest extends BaseControllerTest{
             Priority.HIGH,
             Priority.HIGH.getDescription(),
             deadline,
+            null,
             now, 
             now
         );
@@ -92,6 +94,7 @@ public class TaskControllerTest extends BaseControllerTest{
             Priority.LOW, 
             "Baixa", 
             LocalDateTime.now(), 
+            null,
             OffsetDateTime.now(), 
             OffsetDateTime.now());
 
@@ -134,8 +137,8 @@ public class TaskControllerTest extends BaseControllerTest{
         var taskId2 = UUID.randomUUID();
         var now = OffsetDateTime.now();
 
-        var task1 = new TaskResponseDTO(taskId1, "Task 1", "Desc 1", TaskStatus.PENDING, "Pendente", Priority.LOW, "Baixa", LocalDateTime.now(), now, now);
-        var task2 = new TaskResponseDTO(taskId2, "Task 2", "Desc 2", TaskStatus.DOING, "Em Andamento", Priority.HIGH, "Alta", LocalDateTime.now(), now, now);
+        var task1 = new TaskResponseDTO(taskId1, "Task 1", "Desc 1", TaskStatus.PENDING, "Pendente", Priority.LOW, "Baixa", LocalDateTime.now(), null, now, now);
+        var task2 = new TaskResponseDTO(taskId2, "Task 2", "Desc 2", TaskStatus.DOING, "Em Andamento", Priority.HIGH, "Alta", LocalDateTime.now(), null, now, now);
 
         var taskList = List.of(task1, task2);
 
@@ -155,7 +158,7 @@ public class TaskControllerTest extends BaseControllerTest{
     @Test
     @DisplayName("Deve retornar 400 ao tentar criar tarefa com dados inválidos")
     void shouldReturn400WhenCreatingWithInvalidData() throws Exception {
-        var invalidRequest = new TaskRequestDTO("", "", null, null);
+        var invalidRequest = new TaskRequestDTO("", "", null, null, null);
 
         mockMvc.perform(post("/api/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -173,13 +176,13 @@ public class TaskControllerTest extends BaseControllerTest{
         var deadline = LocalDateTime.now().plusDays(5);
         var now = OffsetDateTime.now();
 
-        var request = new TaskRequestDTO("Título Atualizado", "Nova Desc", Priority.MEDIUM, deadline);
+        var request = new TaskRequestDTO("Título Atualizado", "Nova Desc", Priority.MEDIUM, deadline, null);
         
         var response = new TaskResponseDTO(
                 taskId, request.title(), request.description(),
                 TaskStatus.PENDING, "Pendente",
                 Priority.MEDIUM, "Média",
-                deadline, now, now
+                deadline, null, now, now
         );
 
         when(taskService.updateTask(eq(taskId), any(TaskRequestDTO.class))).thenReturn(response);
@@ -196,7 +199,7 @@ public class TaskControllerTest extends BaseControllerTest{
     @DisplayName("Deve retornar 400 ao tentar atualizar com dados inválidos")
     void shouldReturn400WhenUpdatingWithInvalidData() throws Exception {
         var taskId = UUID.randomUUID();
-        var invalidRequest = new TaskRequestDTO("", "", null, null);
+        var invalidRequest = new TaskRequestDTO("", "", null, null, null);
 
         mockMvc.perform(put("/api/tasks/{id}", taskId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -246,7 +249,7 @@ public class TaskControllerTest extends BaseControllerTest{
                 taskId, "Tarefa Finalizada", "Descrição",
                 TaskStatus.DONE, "Concluída", // Aqui validamos sua nova lógica de Enum
                 Priority.LOW, "Baixa",
-                LocalDateTime.now().plusDays(1), now, now
+                LocalDateTime.now().plusDays(1), null, now, now
         );
 
         when(taskService.completeTask(taskId)).thenReturn(response);
@@ -271,7 +274,7 @@ public class TaskControllerTest extends BaseControllerTest{
                 taskId, "Tarefa em Foco", "Descrição",
                 TaskStatus.DOING, "Em Andamento", 
                 Priority.MEDIUM, "Média",
-                LocalDateTime.now().plusDays(1), now, now
+                LocalDateTime.now().plusDays(1), null, now, now
         );
 
         when(taskService.startTask(taskId)).thenReturn(response);

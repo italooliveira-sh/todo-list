@@ -2,6 +2,7 @@ package com.italooliveira.projeto.todo_list.services;
 
 import com.italooliveira.projeto.todo_list.domain.Task;
 import com.italooliveira.projeto.todo_list.domain.User;
+import com.italooliveira.projeto.todo_list.domain.Category;
 import com.italooliveira.projeto.todo_list.domain.enums.TaskStatus;
 import com.italooliveira.projeto.todo_list.dto.TaskRequestDTO;
 import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
@@ -24,12 +25,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final CategoryService categoryService;
     private final TaskMapper taskMapper;
 
     @Transactional
     public TaskResponseDTO createTask(TaskRequestDTO dto) {
         User user = getAuthenticatedUser();
         Task task = taskMapper.toEntity(dto, user);
+
+        if (dto.categoryId() != null) {
+            Category category = categoryService.findByIdOrThrow(dto.categoryId());
+            validateCategoryOwnership(category, user);
+            task.setCategory(category);
+        }
+
         taskRepository.save(task);
         return taskMapper.toResponseDTO(task);
     }
@@ -60,6 +69,14 @@ public class TaskService {
         task.setDescription(dto.description());
         task.setPriority(dto.priority());
         task.setDeadline(dto.deadline());
+
+        if (dto.categoryId() != null) {
+            Category category = categoryService.findByIdOrThrow(dto.categoryId());
+            validateCategoryOwnership(category, user);
+            task.setCategory(category);
+        } else {
+            task.setCategory(null);
+        }
 
         return taskMapper.toResponseDTO(task);
     }
@@ -105,6 +122,12 @@ public class TaskService {
 
     private void validateOwnership(Task task, User user) {
         if (!task.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenActionException();
+        }
+    }
+
+    private void validateCategoryOwnership(Category category, User user) {
+        if (!category.getUser().getId().equals(user.getId())) {
             throw new ForbiddenActionException();
         }
     }
