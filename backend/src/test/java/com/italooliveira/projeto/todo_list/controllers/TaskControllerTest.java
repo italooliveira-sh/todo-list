@@ -143,7 +143,7 @@ public class TaskControllerTest extends BaseControllerTest{
 
         // Act & Assert
         mockMvc.perform(get("/api/tasks")
-                .contentType(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(2))
                 .andExpect(jsonPath("$[0].id").value(taskId1.toString()))
@@ -153,13 +153,17 @@ public class TaskControllerTest extends BaseControllerTest{
     }
 
     @Test
-    @DisplayName("Deve retornar lista vazia quando o usuário não possui tarefas")
-    void shouldReturnEmptyListWhenUserHasNoTasks() throws Exception {
-        when(taskService.findAllTasks()).thenReturn(List.of());
+    @DisplayName("Deve retornar 400 ao tentar criar tarefa com dados inválidos")
+    void shouldReturn400WhenCreatingWithInvalidData() throws Exception {
+        var invalidRequest = new TaskRequestDTO("", "", null, null);
 
-        mockMvc.perform(get("/api/tasks"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(0));
+        mockMvc.perform(post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Campos inválidos"))
+                .andExpect(jsonPath("$.errors.title").value("O título é obrigatório"))
+                .andExpect(jsonPath("$.errors.priority").value("A prioridade é obrigatória"));
     }
 
     @Test
@@ -192,12 +196,15 @@ public class TaskControllerTest extends BaseControllerTest{
     @DisplayName("Deve retornar 400 ao tentar atualizar com dados inválidos")
     void shouldReturn400WhenUpdatingWithInvalidData() throws Exception {
         var taskId = UUID.randomUUID();
-        var invalidRequest = new TaskRequestDTO("", "", Priority.LOW, null);
+        var invalidRequest = new TaskRequestDTO("", "", null, null);
 
         mockMvc.perform(put("/api/tasks/{id}", taskId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Campos inválidos"))
+                .andExpect(jsonPath("$.errors.title").value("O título é obrigatório"))
+                .andExpect(jsonPath("$.errors.priority").value("A prioridade é obrigatória"));
     }
 
     @Test
