@@ -17,10 +17,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    
+
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final CategoryService categoryService;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Transactional
     public UserResponseDTO registerUser(UserRegistrationDTO dto) {
@@ -31,12 +32,14 @@ public class UserService {
         if (userRepository.existsByName(dto.name())) {
             throw new UsernameAlreadyExistsException();
         }
-        
-        User newUser = userMapper.toEntity(dto);
-        newUser.setPassword(passwordEncoder.encode(dto.password()));
-        User savedUser = userRepository.save(newUser);
+
+        User user = userMapper.toEntity(dto);
+        user.setPassword(passwordEncoder.encode(dto.password()));
+
+        User savedUser = userRepository.save(user);
+
+        categoryService.createDefaultCategories(savedUser);
 
         return userMapper.toResponseDTO(savedUser);
-
     }
 }

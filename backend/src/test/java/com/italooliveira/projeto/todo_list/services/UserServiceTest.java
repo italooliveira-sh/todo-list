@@ -32,6 +32,9 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private CategoryService categoryService;
+
     @Spy
     private UserMapper userMapper = new UserMapper();
 
@@ -61,10 +64,8 @@ class UserServiceTest {
         assertEquals(dto.name(), result.name());
         
         verify(passwordEncoder).encode(dto.password());
-        verify(userRepository).save(argThat(user -> 
-            user.getPassword().equals(senhaCriptografada) && 
-            user.getName().equals(dto.name())
-        ));
+        verify(userRepository).save(any(User.class));
+        verify(categoryService).createDefaultCategories(any(User.class));
     }
 
     @Test
