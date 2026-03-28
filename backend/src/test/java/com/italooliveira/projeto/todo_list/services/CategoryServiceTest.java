@@ -6,7 +6,6 @@ import com.italooliveira.projeto.todo_list.dto.CategoryRequestDTO;
 import com.italooliveira.projeto.todo_list.dto.CategoryResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.CategoryAlreadyExistsException;
 import com.italooliveira.projeto.todo_list.exceptions.ForbiddenActionException;
-import com.italooliveira.projeto.todo_list.exceptions.ResourceNotFoundException;
 import com.italooliveira.projeto.todo_list.mappers.CategoryMapper;
 import com.italooliveira.projeto.todo_list.repositories.CategoryRepository;
 import com.italooliveira.projeto.todo_list.repositories.TaskRepository;
