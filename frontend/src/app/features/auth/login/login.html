@@ -1,0 +1,42 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <mat-card class="w-full max-w-md p-8 shadow-xl">
+    <mat-card-header class="flex justify-center mb-6">
+      <div class="flex flex-col items-center">
+        <mat-icon color="primary" class="scale-150 mb-2">task_alt</mat-icon>
+        <mat-card-title class="text-2xl font-bold">ToDo Pro</mat-card-title>
+        <mat-card-subtitle>Acesse sua conta para gerenciar tarefas</mat-card-subtitle>
+      </div>
+    </mat-card-header>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      
+      <mat-form-field appearance="outline">
+        <mat-label>E-mail</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="seu@email.com">
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">E-mail inválido</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Senha</mat-label>
+        <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
+        <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Senha é obrigatória</mat-error>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" 
+              class="w-full h-12 text-lg" 
+              [disabled]="loginForm.invalid">
+        ENTRAR
+      </button>
+
+      <div class="text-center mt-4">
+        <p class="text-sm text-gray-600">
+          Não tem uma conta? <a routerLink="/register" class="text-blue-600 font-medium">Cadastre-se</a>
+        </p>
+      </div>
+    </form>
+  </mat-card>
+</div>
