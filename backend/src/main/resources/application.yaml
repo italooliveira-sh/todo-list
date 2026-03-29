@@ -17,3 +17,5 @@ api:
   security:
     token:
       secret: ${JWT_SECRET}
+    cors:
+      allowed-origins: ${ALLOWED_ORIGINS:http://localhost:4200}
