@@ -58,10 +58,16 @@ export class RegisterComponent {
     if (this.registerForm.valid) {
       const { name, email, password } = this.registerForm.getRawValue();
       
-      // Por enquanto, vamos apenas dar um log, pois ainda não criamos o método 'register' no AuthService
-      console.log('Dados do registro:', { name, email, password });
-      
-      // Aqui chamaremos o serviço no próximo passo
+      this.authService.register({ name: name!, email: email!, password: password! }).subscribe({
+        next: () => {
+          console.log('Registro realizado com sucesso!');
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          console.error('Erro ao realizar registro', err);
+          // Aqui depois colocaremos o SnackBar
+        }
+      });
     }
   }
 }
