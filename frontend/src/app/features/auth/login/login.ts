@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/services/auth';
 import { AuthLayoutComponent } from '../../../shared/components/layout/auth-layout/auth-layout';
 
@@ -22,6 +23,7 @@ import { AuthLayoutComponent } from '../../../shared/components/layout/auth-layo
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
+    MatSnackBarModule,
     AuthLayoutComponent
   ],
   templateUrl: './login.html',
@@ -31,6 +33,7 @@ export class LoginComponent {
   private formBuilder = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
 
   // Definindo o formulário e suas validações
   loginForm = this.formBuilder.group({
@@ -46,12 +49,16 @@ export class LoginComponent {
       
       this.authService.login(loginData as any).subscribe({
         next: () => {
-          console.log('Login realizado com sucesso!');
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           console.error('Erro ao fazer login', err);
-          // Aqui depois podemos colocar um SnackBar do Material para avisar o usuário
+          this.snackBar.open('E-mail ou senha inválidos. Tente novamente.', 'Fechar', {
+            duration: 5000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar']
+          });
         }
       });
     }

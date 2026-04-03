@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/services/auth';
 import { AuthLayoutComponent } from '../../../shared/components/layout/auth-layout/auth-layout';
 
@@ -22,6 +23,7 @@ import { AuthLayoutComponent } from '../../../shared/components/layout/auth-layo
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
+    MatSnackBarModule,
     AuthLayoutComponent
   ],
   templateUrl: './register.html',
@@ -31,6 +33,7 @@ export class RegisterComponent {
   private formBuilder = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
 
   // Definindo o formulário de registro com validações
   registerForm = this.formBuilder.group({
@@ -60,12 +63,21 @@ export class RegisterComponent {
       
       this.authService.register({ name: name!, email: email!, password: password! }).subscribe({
         next: () => {
-          console.log('Registro realizado com sucesso!');
+          this.snackBar.open('Conta criada com sucesso!', 'Fechar', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          });
           this.router.navigate(['/login']);
         },
         error: (err) => {
           console.error('Erro ao realizar registro', err);
-          // Aqui depois colocaremos o SnackBar
+          this.snackBar.open('Ocorreu um erro ao criar sua conta. Tente novamente.', 'Fechar', {
+            duration: 5000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar']
+          });
         }
       });
     }

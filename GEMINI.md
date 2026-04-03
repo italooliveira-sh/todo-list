@@ -49,5 +49,5 @@ Este documento serve como a "fonte da verdade" para o estado técnico e as decis
 
 ## 📌 PRÓXIMOS PASSOS (TASK LIST)
 1. [x] Implementar `AuthService.register` no frontend para conectar com `/api/users`.
-2. [ ] Adicionar feedback visual (SnackBar) para erros de login/registro.
+2. [x] Adicionar feedback visual (SnackBar) para erros de login/register.
 3. [ ] Desenvolver o Dashboard (Lista de tarefas e filtros).
