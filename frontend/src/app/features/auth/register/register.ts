@@ -72,7 +72,11 @@ export class RegisterComponent {
         },
         error: (err) => {
           console.error('Erro ao realizar registro', err);
-          this.snackBar.open('Ocorreu um erro ao criar sua conta. Tente novamente.', 'Fechar', {
+          
+          // Tenta extrair a mensagem do backend (ApiErrorMessage)
+          const errorMessage = err.error?.message || 'Ocorreu um erro ao criar sua conta. Tente novamente.';
+          
+          this.snackBar.open(errorMessage, 'Fechar', {
             duration: 5000,
             horizontalPosition: 'right',
             verticalPosition: 'top',
