@@ -1,42 +1,50 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-  <mat-card class="w-full max-w-md p-8 shadow-xl">
-    <mat-card-header class="flex justify-center mb-6">
-      <div class="flex flex-col items-center">
-        <mat-icon color="primary" class="scale-150 mb-2">task_alt</mat-icon>
-        <mat-card-title class="text-2xl font-bold">ToDo Pro</mat-card-title>
-        <mat-card-subtitle>Acesse sua conta para gerenciar tarefas</mat-card-subtitle>
-      </div>
-    </mat-card-header>
-
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-      
-      <mat-form-field appearance="outline">
+<app-auth-layout
+  title="ToDo Pro"
+  subtitle="Sua produtividade em um novo nível"
+  icon="task_alt"
+  iconRotation="-rotate-6"
+  cardMaxWidth="max-w-md"
+>
+  <form authForm [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+    
+    <div class="space-y-1">
+      <mat-form-field appearance="outline" class="w-full !mb-0">
         <mat-label>E-mail</mat-label>
-        <input matInput formControlName="email" type="email" placeholder="seu@email.com">
-        <mat-icon matSuffix>email</mat-icon>
+        <input matInput formControlName="email" type="email" placeholder="exemplo@email.com">
+        <mat-icon matSuffix class="!text-slate-300 !w-6 !h-6 flex items-center justify-center overflow-visible">mail</mat-icon>
         <mat-error *ngIf="loginForm.get('email')?.hasError('email')">E-mail inválido</mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">E-mail é obrigatório</mat-error>
       </mat-form-field>
+    </div>
 
-      <mat-form-field appearance="outline">
+    <div class="space-y-1">
+      <mat-form-field appearance="outline" class="w-full !mb-0">
         <mat-label>Senha</mat-label>
         <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
-        <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
-          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword" class="!text-slate-300">
+          <mat-icon class="!w-6 !h-6 flex items-center justify-center overflow-visible">{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
         <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Senha é obrigatória</mat-error>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">Mínimo de 6 caracteres</mat-error>
       </mat-form-field>
+    </div>
 
-      <button mat-flat-button color="primary" type="submit" 
-              class="w-full h-12 text-lg" 
-              [disabled]="loginForm.invalid">
-        ENTRAR
-      </button>
+    <button mat-flat-button type="submit" 
+            class="w-full !h-16 !text-lg !font-bold !bg-pink-600 !text-white !rounded-2xl shadow-lg shadow-pink-200 hover:!bg-pink-700 hover:shadow-pink-300 transition-all transform hover:-translate-y-1 active:scale-95 disabled:!bg-slate-200 flex items-center justify-center gap-2" 
+            [disabled]="loginForm.invalid">
+      <span>Entrar no App</span>
+      <mat-icon class="!w-6 !h-6 !text-2xl flex items-center justify-center overflow-visible">arrow_forward</mat-icon>
+    </button>
+  </form>
 
-      <div class="text-center mt-4">
-        <p class="text-sm text-gray-600">
-          Não tem uma conta? <a routerLink="/register" class="text-blue-600 font-medium">Cadastre-se</a>
-        </p>
-      </div>
-    </form>
-  </mat-card>
-</div>
+  <div authFooter class="flex flex-col items-center gap-4">
+    <div class="w-full h-px bg-slate-100"></div>
+    
+    <p class="text-slate-500 font-medium text-sm">
+      Novo por aqui?
+      <a routerLink="/register" class="text-indigo-600 font-bold hover:text-indigo-800 transition-colors ml-1">
+        Criar conta gratuita
+      </a>
+    </p>
+  </div>
+</app-auth-layout>
