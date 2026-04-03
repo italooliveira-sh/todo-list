@@ -23,12 +23,13 @@ Este documento serve como a "fonte da verdade" para o estado técnico e as decis
   - ✅ Tela de Registro (Layout independente com validação de senha).
   - ✅ `TokenService` para armazenamento local do JWT.
   - ✅ `AuthService`: Método `login` e `register` prontos.
+  - ✅ `TaskService`: CRUD completo de tarefas pronto.
 
 ### 2. Gestão de Tarefas e Categorias (Backend Pronto)
 - ✅ CRUD completo de Tarefas (com prioridades e status).
 - ✅ CRUD completo de Categorias.
 - ✅ Filtragem e busca implementadas.
-- ⚠️ **Frontend:** Telas de Dashboard e CRUD ainda são esqueletos iniciais.
+- ⚠️ **Frontend:** Telas de Dashboard e CRUD iniciadas.
 
 ---
 
@@ -50,4 +51,5 @@ Este documento serve como a "fonte da verdade" para o estado técnico e as decis
 ## 📌 PRÓXIMOS PASSOS (TASK LIST)
 1. [x] Implementar `AuthService.register` no frontend para conectar com `/api/users`.
 2. [x] Adicionar feedback visual (SnackBar) para erros de login/register.
-3. [ ] Desenvolver o Dashboard (Lista de tarefas e filtros).
+3. [ ] Implementar listagem de tarefas no Dashboard (UI).
+4. [ ] Implementar criação e edição de tarefas.
