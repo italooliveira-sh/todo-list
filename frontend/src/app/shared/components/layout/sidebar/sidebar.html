@@ -1,0 +1,50 @@
+<!-- Ajuste dinâmico de largura e padding -->
+<aside class="h-full bg-white border-r border-slate-200 flex flex-col py-6 sticky top-16 transition-all duration-300 overflow-hidden"
+       [class.w-64]="!isCollapsed()"
+       [class.w-20]="isCollapsed()">
+  
+  <div class="mb-8 transition-all duration-300"
+       [class.px-5]="!isCollapsed()"
+       [class.px-2]="isCollapsed()">
+    
+    <h3 *ngIf="!isCollapsed()" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 truncate ml-1">
+      Minhas Listas
+    </h3>
+    
+    <div class="flex flex-col gap-2">
+      <button *ngFor="let cat of categories" 
+              mat-button 
+              class="w-full !flex !items-center !rounded-xl !transition-all !duration-200 !min-w-0"
+              [class.!justify-start]="!isCollapsed()"
+              [class.!justify-center]="isCollapsed()"
+              [class.!px-3]="!isCollapsed()"
+              [class.!px-0]="isCollapsed()"
+              [class.!py-4]="true"
+              [ngClass]="cat.active ? '!bg-indigo-50 !text-indigo-700 !font-semibold' : '!text-slate-500 hover:!bg-slate-50 hover:!text-indigo-600'">
+        
+        <!-- Ícone com tamanho de container ajustado para não cortar -->
+        <mat-icon class="custom-icon" 
+                  [class.mr-3]="!isCollapsed()">
+          {{ cat.icon }}
+        </mat-icon>
+        
+        <span *ngIf="!isCollapsed()" class="text-sm truncate animate-in fade-in slide-in-from-left-2 duration-300">
+          {{ cat.name }}
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Projeto Atual -->
+  <div class="mt-auto border-t border-slate-100 pt-6 transition-all duration-300"
+       [class.px-5]="!isCollapsed()"
+       [class.px-2]="isCollapsed()">
+    <div class="bg-indigo-900/5 rounded-2xl p-4 flex flex-col items-center" [class.items-start]="!isCollapsed()">
+      <p *ngIf="!isCollapsed()" class="text-[9px] font-bold text-indigo-900 uppercase mb-2 tracking-tighter truncate">Projeto Atual</p>
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse min-w-2"></div>
+        <span *ngIf="!isCollapsed()" class="text-[10px] font-mono text-indigo-900 truncate">TODO-PRO v1.0.2</span>
+      </div>
+    </div>
+  </div>
+</aside>

@@ -1,0 +1,20 @@
+<div class="flex flex-col min-h-screen bg-slate-50 relative">
+  <!-- Header Fixo no Topo -->
+  <app-header (toggleMenu)="toggleSidebar()"></app-header>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar Adaptativa -->
+    <!-- Passamos !isSidebarOpen() para isCollapsed para que "aberto" no layout signifique "não compactado" -->
+    <app-sidebar class="z-40 transition-all duration-300"
+                 [isCollapsed]="!isSidebarOpen()">
+    </app-sidebar>
+
+    <!-- Área de Conteúdo + Footer -->
+    <div class="flex flex-col flex-1 overflow-y-auto">
+      <main class="flex-grow">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
+  <app-footer></app-footer>
+</div>
