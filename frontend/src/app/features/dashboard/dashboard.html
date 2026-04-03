@@ -1,0 +1,113 @@
+<div class="dashboard-container p-4 sm:p-10 min-h-full">
+  <main class="w-full">
+    
+    <!-- Header Interno -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 bg-gradient-to-r from-indigo-900 to-purple-800 p-8 rounded-2xl text-white shadow-lg">
+      <h1 class="text-2xl font-bold tracking-tight">Dashboard - {{ userName }}</h1>
+      <button mat-flat-button class="!bg-pink-600 !text-white !px-8 !py-6 !rounded-xl flex items-center gap-2 shadow-lg hover:!bg-pink-700 transition-all">
+        <mat-icon class="!w-6 !h-6 !text-2xl flex items-center justify-center overflow-visible">add</mat-icon> 
+        <span class="font-bold">Nova Tarefa</span>
+      </button>
+    </header>
+
+    <!-- Stats Cards - Layout Horizontal ULTRA EXPLÍCITO -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-12">
+      
+      <!-- Card Pendentes -->
+      <mat-card class="!p-6 !rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-default !block">
+        <div class="!flex !flex-row !items-center !justify-start !gap-6 w-full">
+          <!-- Ícone à Esquerda -->
+          <div class="w-16 h-16 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
+            <mat-icon class="!text-3xl !w-8 !h-8 flex items-center justify-center overflow-visible">schedule</mat-icon>
+          </div>
+          <!-- Texto à Direita -->
+          <div class="flex flex-col items-start justify-center">
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Pendentes</p>
+            <span class="text-3xl sm:text-4xl font-black text-slate-800 tabular-nums leading-none">3</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Card Em Andamento -->
+      <mat-card class="!p-6 !rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-default !block">
+        <div class="!flex !flex-row !items-center !justify-start !gap-6 w-full">
+          <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
+            <mat-icon class="!text-3xl !w-8 !h-8 flex items-center justify-center overflow-visible">play_arrow</mat-icon>
+          </div>
+          <div class="flex flex-col items-start justify-center">
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Fazendo</p>
+            <span class="text-3xl sm:text-4xl font-black text-slate-800 tabular-nums leading-none">1</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Card Concluídas -->
+      <mat-card class="!p-6 !rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-default !block">
+        <div class="!flex !flex-row !items-center !justify-start !gap-6 w-full">
+          <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
+            <mat-icon class="!text-3xl !w-8 !h-8 flex items-center justify-center overflow-visible">check</mat-icon>
+          </div>
+          <div class="flex flex-col items-start justify-center">
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Concluídas</p>
+            <span class="text-3xl sm:text-4xl font-black text-slate-800 tabular-nums leading-none">5</span>
+          </div>
+        </div>
+      </mat-card>
+
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col lg:flex-row items-center gap-8 mb-12">
+      <div class="w-full lg:flex-1">
+        <mat-form-field appearance="outline" class="w-full !mb-0">
+          <mat-icon matPrefix class="mr-3 text-slate-400 !w-6 !h-6 flex items-center justify-center overflow-visible">search</mat-icon>
+          <mat-label>Pesquisar tarefas...</mat-label>
+          <input matInput>
+        </mat-form-field>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-10 w-full lg:w-auto">
+        <div class="flex flex-col gap-3 w-full sm:w-auto">
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Filtrar Status</p>
+          <mat-chip-listbox>
+            <mat-chip-option selected class="!bg-indigo-50 !text-indigo-700">Pendentes</mat-chip-option>
+            <mat-chip-option>Fazendo</mat-chip-option>
+            <mat-chip-option>Feito</mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+
+        <div class="flex flex-col gap-3 w-full sm:w-auto">
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Filtrar Prioridade</p>
+          <mat-chip-listbox>
+            <mat-chip-option class="!bg-rose-50 !text-rose-600 font-bold">Alta</mat-chip-option>
+            <mat-chip-option class="!bg-amber-50 !text-amber-600 font-bold">Média</mat-chip-option>
+            <mat-chip-option class="!bg-sky-50 !text-sky-600 font-bold">Baixa</mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Tarefas -->
+    <div class="grid grid-cols-1 gap-6">
+      <mat-card class="!p-0 !rounded-3xl shadow-sm border-l-[12px] border-rose-500 overflow-hidden hover:shadow-lg transition-all duration-300">
+        <div class="p-8 sm:p-10">
+          <div class="flex flex-col mb-8">
+            <span class="text-rose-600 text-xs font-black uppercase tracking-widest mb-2">Prioridade Alta</span>
+            <h3 class="text-2xl font-bold text-slate-800 mb-3">Finalizar API Spring Boot</h3>
+            <p class="text-slate-500 text-lg leading-relaxed max-w-3xl">Finalizar API Spring Boot e completar os testes de integração para garantir 100% de cobertura.</p>
+          </div>
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-t border-slate-100 pt-8 gap-6">
+            <div class="flex items-center gap-3 text-slate-700 font-bold text-lg">
+              <mat-icon class="text-slate-300 !text-2xl !w-7 !h-7 flex items-center justify-center overflow-visible">calendar_today</mat-icon> 
+              <span class="text-slate-500 font-medium">Prazo:</span> 15 de Abril
+            </div>
+            <div class="flex gap-4 w-full sm:w-auto">
+              <button mat-flat-button class="!bg-indigo-900 !text-white !px-10 !py-6 !rounded-xl flex-1 sm:flex-none font-bold">Começar</button>
+              <button mat-flat-button class="!bg-pink-600 !text-white !px-10 !py-6 !rounded-xl flex-1 sm:flex-none font-bold">Concluir</button>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </main>
+</div>
