@@ -3,27 +3,25 @@
     
     <!-- Header Interno -->
     <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 bg-gradient-to-r from-indigo-900 to-purple-800 p-8 rounded-2xl text-white shadow-lg">
-      <h1 class="text-2xl font-bold tracking-tight">Dashboard - {{ userName }}</h1>
+      <h1 class="text-2xl font-bold tracking-tight">Suas Tarefas</h1>
       <button mat-flat-button class="!bg-pink-600 !text-white !px-8 !py-6 !rounded-xl flex items-center gap-2 shadow-lg hover:!bg-pink-700 transition-all">
         <mat-icon class="!w-6 !h-6 !text-2xl flex items-center justify-center overflow-visible">add</mat-icon> 
         <span class="font-bold">Nova Tarefa</span>
       </button>
     </header>
 
-    <!-- Stats Cards - Layout Horizontal ULTRA EXPLÍCITO -->
+    <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-12">
       
       <!-- Card Pendentes -->
       <mat-card class="!p-6 !rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-default !block">
         <div class="!flex !flex-row !items-center !justify-start !gap-6 w-full">
-          <!-- Ícone à Esquerda -->
           <div class="w-16 h-16 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
             <mat-icon class="!text-3xl !w-8 !h-8 flex items-center justify-center overflow-visible">schedule</mat-icon>
           </div>
-          <!-- Texto à Direita -->
           <div class="flex flex-col items-start justify-center">
             <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Pendentes</p>
-            <span class="text-3xl sm:text-4xl font-black text-slate-800 tabular-nums leading-none">3</span>
+            <span class="text-3xl sm:text-4xl font-black text-slate-800 tabular-nums leading-none">{{ stats.pending }}</span>
           </div>
         </div>
       </mat-card>
@@ -36,7 +34,7 @@
           </div>
           <div class="flex flex-col items-start justify-center">
             <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Fazendo</p>
-            <span class="text-3xl sm:text-4xl font-black text-slate-800 tabular-nums leading-none">1</span>
+            <span class="text-3xl sm:text-4xl font-black text-slate-800 tabular-nums leading-none">{{ stats.doing }}</span>
           </div>
         </div>
       </mat-card>
@@ -49,7 +47,7 @@
           </div>
           <div class="flex flex-col items-start justify-center">
             <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Concluídas</p>
-            <span class="text-3xl sm:text-4xl font-black text-slate-800 tabular-nums leading-none">5</span>
+            <span class="text-3xl sm:text-4xl font-black text-slate-800 tabular-nums leading-none">{{ stats.done }}</span>
           </div>
         </div>
       </mat-card>
@@ -70,9 +68,10 @@
         <div class="flex flex-col gap-3 w-full sm:w-auto">
           <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Filtrar Status</p>
           <mat-chip-listbox>
-            <mat-chip-option selected class="!bg-indigo-50 !text-indigo-700">Pendentes</mat-chip-option>
+            <mat-chip-option selected class="!bg-indigo-50 !text-indigo-700">Todos</mat-chip-option>
+            <mat-chip-option>Pendentes</mat-chip-option>
             <mat-chip-option>Fazendo</mat-chip-option>
-            <mat-chip-option>Feito</mat-chip-option>
+            <mat-chip-option>Concluídas</mat-chip-option>
           </mat-chip-listbox>
         </div>
 
@@ -89,21 +88,76 @@
 
     <!-- Lista de Tarefas -->
     <div class="grid grid-cols-1 gap-6">
-      <mat-card class="!p-0 !rounded-3xl shadow-sm border-l-[12px] border-rose-500 overflow-hidden hover:shadow-lg transition-all duration-300">
+      
+      <!-- Estado de Carregamento -->
+      <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+        <p class="text-slate-500 font-medium">Carregando suas tarefas...</p>
+      </div>
+
+      <!-- Lista Vazia -->
+      <div *ngIf="!loading && tasks.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
+        <mat-icon class="!w-16 !h-16 !text-6xl text-slate-200 mb-6 flex items-center justify-center overflow-visible">assignment</mat-icon>
+        <p class="text-slate-500 text-xl font-bold mb-2">Nenhuma tarefa encontrada</p>
+        <p class="text-slate-400 mb-8">Comece criando sua primeira tarefa hoje!</p>
+        <button mat-flat-button class="!bg-indigo-900 !text-white !px-8 !py-6 !rounded-xl font-bold">Criar Tarefa</button>
+      </div>
+
+      <!-- Cards de Tarefas -->
+      <mat-card *ngFor="let task of tasks" 
+                class="!p-0 !rounded-3xl shadow-sm border-l-[12px] overflow-hidden hover:shadow-lg transition-all duration-300"
+                [ngClass]="{
+                  'border-rose-500': task.priority === 'HIGH',
+                  'border-amber-500': task.priority === 'MEDIUM',
+                  'border-sky-500': task.priority === 'LOW',
+                  'opacity-60': task.status === 'DONE'
+                }">
         <div class="p-8 sm:p-10">
           <div class="flex flex-col mb-8">
-            <span class="text-rose-600 text-xs font-black uppercase tracking-widest mb-2">Prioridade Alta</span>
-            <h3 class="text-2xl font-bold text-slate-800 mb-3">Finalizar API Spring Boot</h3>
-            <p class="text-slate-500 text-lg leading-relaxed max-w-3xl">Finalizar API Spring Boot e completar os testes de integração para garantir 100% de cobertura.</p>
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-black uppercase tracking-widest mb-2"
+                    [ngClass]="{
+                      'text-rose-600': task.priority === 'HIGH',
+                      'text-amber-600': task.priority === 'MEDIUM',
+                      'text-sky-600': task.priority === 'LOW'
+                    }">
+                {{ task.priorityDescription }}
+              </span>
+              <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600">
+                {{ task.statusDescription }}
+              </span>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-800 mb-3" [ngClass]="{'line-through': task.status === 'DONE'}">
+              {{ task.title }}
+            </h3>
+            <p class="text-slate-500 text-lg leading-relaxed max-w-3xl">{{ task.description }}</p>
           </div>
+
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-t border-slate-100 pt-8 gap-6">
             <div class="flex items-center gap-3 text-slate-700 font-bold text-lg">
               <mat-icon class="text-slate-300 !text-2xl !w-7 !h-7 flex items-center justify-center overflow-visible">calendar_today</mat-icon> 
-              <span class="text-slate-500 font-medium">Prazo:</span> 15 de Abril
+              <span class="text-slate-500 font-medium">Prazo:</span> 
+              {{ task.deadline ? (task.deadline | date:'dd/MM/yyyy') : 'Sem prazo' }}
             </div>
-            <div class="flex gap-4 w-full sm:w-auto">
-              <button mat-flat-button class="!bg-indigo-900 !text-white !px-10 !py-6 !rounded-xl flex-1 sm:flex-none font-bold">Começar</button>
-              <button mat-flat-button class="!bg-pink-600 !text-white !px-10 !py-6 !rounded-xl flex-1 sm:flex-none font-bold">Concluir</button>
+            
+            <div class="flex gap-4 w-full sm:w-auto" *ngIf="task.status !== 'DONE'">
+              <button *ngIf="task.status === 'PENDING'"
+                      mat-flat-button 
+                      class="!bg-indigo-900 !text-white !px-10 !py-6 !rounded-xl flex-1 sm:flex-none font-bold"
+                      (click)="startTask(task.id)">
+                Começar
+              </button>
+              
+              <button mat-flat-button 
+                      class="!bg-pink-600 !text-white !px-10 !py-6 !rounded-xl flex-1 sm:flex-none font-bold"
+                      (click)="completeTask(task.id)">
+                Concluir
+              </button>
+            </div>
+            
+            <div *ngIf="task.status === 'DONE'" class="flex items-center gap-2 text-emerald-600 font-bold">
+              <mat-icon>check_circle</mat-icon>
+              Tarefa Concluída
             </div>
           </div>
         </div>
