@@ -1,22 +1,29 @@
+.active-link {
+  background-color: #f1f5f9 !important; /* slate-100 */
+  color: #4338ca !important; /* indigo-700 */
+}
+
+.active-link mat-icon {
+  color: #4f46e5 !important;
+}
+
+.sidebar-link {
+  color: #64748b !important; /* slate-500 */
+  border: 1px solid transparent;
+}
+
+.sidebar-link:hover {
+  background-color: #f8fafc !important; /* slate-50 */
+  color: #1e293b !important; /* slate-800 */
+}
+
+/* Esconde o texto suavemente quando colapsado */
+span {
+  white-space: nowrap;
+}
+
 .custom-icon {
-  /* Tamanho de fonte aumentado */
-  font-size: 28px !important;
-  
-  /* Ajuste de container para não cortar */
-  width: 28px !important;
-  height: 28px !important;
-  
-  /* Garantia de centralização interna */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  
-  /* Se o ícone for menor, evitamos distorção */
-  line-height: 28px !important;
-  overflow: visible !important;
-}
-
-/* Garantia de alinhamento vertical dentro do botão */
-::ng-deep .mat-mdc-button-touch-target {
-  display: none !important; /* Remove o alvo de toque extra do Material que atrapalha o padding */
 }
