@@ -1,4 +1,4 @@
-import { Component, input, inject, OnInit, HostBinding } from '@angular/core';
+import { Component, input, inject, OnInit, HostBinding, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,11 +15,11 @@ import { Category } from '../../../../shared/models/task.model';
 })
 export class SidebarComponent implements OnInit {
   private categoryService = inject(CategoryService);
+  private cdr = inject(ChangeDetectorRef);
   
   isCollapsed = input(false);
   categories: Category[] = [];
 
-  // Vincula a classe CSS 'collapsed' ao elemento <app-sidebar> baseado no input
   @HostBinding('class.collapsed') get collapsed() {
     return this.isCollapsed();
   }
@@ -30,7 +30,10 @@ export class SidebarComponent implements OnInit {
 
   loadCategories(): void {
     this.categoryService.findAll().subscribe({
-      next: (res) => this.categories = res,
+      next: (res) => {
+        this.categories = res;
+        this.cdr.detectChanges(); // Força o Angular a reconhecer a mudança de [] para a lista real
+      },
       error: (err) => console.error('Erro ao carregar categorias na sidebar', err)
     });
   }
