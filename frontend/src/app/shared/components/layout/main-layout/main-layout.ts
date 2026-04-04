@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, NavigationEnd, Router } from '@angular/router';
 import { HeaderComponent } from '../header/header';
@@ -13,16 +13,34 @@ import { filter } from 'rxjs/operators';
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css',
 })
-export class MainLayout {
+export class MainLayout implements OnInit {
   private router = inject(Router);
-  isSidebarOpen = signal(false);
+  
+  isSidebarOpen = signal(true);
+  isMobile = signal(false);
+
+  ngOnInit() {
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize')
+  checkScreenSize() {
+    const mobile = window.innerWidth < 768;
+    this.isMobile.set(mobile);
+    
+    // No mobile, a sidebar começa fechada. No desktop, começa aberta.
+    if (mobile && this.isSidebarOpen()) {
+      this.isSidebarOpen.set(false);
+    }
+  }
 
   constructor() {
-    // Fecha a sidebar automaticamente ao navegar (importante para mobile)
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
-      this.isSidebarOpen.set(false);
+      if (this.isMobile()) {
+        this.isSidebarOpen.set(false);
+      }
     });
   }
 

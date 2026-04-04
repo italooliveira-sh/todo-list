@@ -1,7 +1,14 @@
-<aside class="h-full bg-white border-r border-slate-200 flex flex-col py-6 sticky top-16 transition-all duration-300 overflow-hidden"
+<aside class="h-full bg-white flex flex-col py-6 sticky top-16 transition-all duration-300 overflow-hidden"
        [class.w-64]="!isCollapsed()"
        [class.w-20]="isCollapsed()">
   
+  <!-- Botão de fechar visível apenas no mobile para facilitar a saída -->
+  <div *ngIf="!isCollapsed()" class="md:hidden flex justify-end px-4 mb-2">
+    <button mat-icon-button class="!text-slate-400">
+      <!-- O clique aqui não precisa de lógica nova, pois o backdrop já trata o fechamento se dispararmos o evento de toggle no pai se desejar, mas clicar fora é o padrão -->
+    </button>
+  </div>
+
   <div class="mb-8 transition-all duration-300"
        [class.px-4]="!isCollapsed()"
        [class.px-2]="isCollapsed()">
@@ -28,7 +35,6 @@
               mat-button 
               class="w-full !rounded-xl !transition-all !duration-200 !px-4 !py-7 sidebar-link">
         <div class="flex items-center w-full" [class.justify-center]="isCollapsed()">
-          <!-- Bolinha colorida -->
           <div class="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm" 
                [style.background-color]="cat.color"
                [class.mr-4]="!isCollapsed()">
@@ -44,7 +50,7 @@
         </div>
       </button>
 
-      <!-- Botão para Criar Categoria (Agora visível também colapsado) -->
+      <!-- Botão para Criar Categoria -->
       <button mat-button 
               class="w-full !rounded-xl !text-slate-400 hover:!bg-slate-50 !px-4 !py-7 !mt-4 !border !border-dashed !border-slate-200"
               [class.!px-0]="isCollapsed()">

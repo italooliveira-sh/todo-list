@@ -1,4 +1,4 @@
-import { Component, input, inject, OnInit } from '@angular/core';
+import { Component, input, inject, OnInit, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,6 +18,11 @@ export class SidebarComponent implements OnInit {
   
   isCollapsed = input(false);
   categories: Category[] = [];
+
+  // Vincula a classe CSS 'collapsed' ao elemento <app-sidebar> baseado no input
+  @HostBinding('class.collapsed') get collapsed() {
+    return this.isCollapsed();
+  }
 
   ngOnInit(): void {
     this.loadCategories();
