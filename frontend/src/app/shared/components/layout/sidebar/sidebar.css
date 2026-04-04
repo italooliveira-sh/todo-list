@@ -17,6 +17,20 @@
   color: #1e293b !important; /* slate-800 */
 }
 
+/* Estilos para modo Mobile (Overlay) */
+@media (max-width: 767px) {
+  :host {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 280px;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+    background-color: white;
+    padding-top: 64px; /* Altura do header */
+  }
+}
+
 /* Esconde o texto suavemente quando colapsado */
 span {
   white-space: nowrap;
