@@ -4,7 +4,7 @@
     <!-- Header Interno -->
     <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 bg-gradient-to-r from-indigo-900 to-purple-800 p-8 rounded-2xl text-white shadow-lg">
       <h1 class="text-2xl font-bold tracking-tight">Suas Tarefas</h1>
-      <button mat-flat-button class="!bg-pink-600 !text-white !px-8 !py-6 !rounded-xl flex items-center gap-2 shadow-lg hover:!bg-pink-700 transition-all">
+      <button (click)="openTaskForm()" mat-flat-button class="!bg-pink-600 !text-white !px-8 !py-6 !rounded-xl flex items-center gap-2 shadow-lg hover:!bg-pink-700 transition-all">
         <mat-icon class="!w-6 !h-6 !text-2xl flex items-center justify-center overflow-visible">add</mat-icon> 
         <span class="font-bold">Nova Tarefa</span>
       </button>
@@ -71,7 +71,7 @@
             <mat-chip-option selected class="!bg-indigo-50 !text-indigo-700">Todos</mat-chip-option>
             <mat-chip-option>Pendentes</mat-chip-option>
             <mat-chip-option>Fazendo</mat-chip-option>
-            <mat-chip-option>Concluídas</mat-chip-option>
+            <mat-chip-option>Feito</mat-chip-option>
           </mat-chip-listbox>
         </div>
 
@@ -100,7 +100,7 @@
         <mat-icon class="!w-16 !h-16 !text-6xl text-slate-200 mb-6 flex items-center justify-center overflow-visible">assignment</mat-icon>
         <p class="text-slate-500 text-xl font-bold mb-2">Nenhuma tarefa encontrada</p>
         <p class="text-slate-400 mb-8">Comece criando sua primeira tarefa hoje!</p>
-        <button mat-flat-button class="!bg-indigo-900 !text-white !px-8 !py-6 !rounded-xl font-bold">Criar Tarefa</button>
+        <button (click)="openTaskForm()" mat-flat-button class="!bg-indigo-900 !text-white !px-8 !py-6 !rounded-xl font-bold">Criar Tarefa</button>
       </div>
 
       <!-- Cards de Tarefas -->
@@ -115,21 +115,39 @@
         <div class="p-8 sm:p-10">
           <div class="flex flex-col mb-8">
             <div class="flex justify-between items-start">
-              <span class="text-xs font-black uppercase tracking-widest mb-2"
-                    [ngClass]="{
-                      'text-rose-600': task.priority === 'HIGH',
-                      'text-amber-600': task.priority === 'MEDIUM',
-                      'text-sky-600': task.priority === 'LOW'
-                    }">
-                {{ task.priorityDescription }}
-              </span>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-black uppercase tracking-widest mb-2"
+                      [ngClass]="{
+                        'text-rose-600': task.priority === 'HIGH',
+                        'text-amber-600': task.priority === 'MEDIUM',
+                        'text-sky-600': task.priority === 'LOW'
+                      }">
+                  {{ task.priorityDescription }}
+                </span>
+                <span class="w-2 h-2 rounded-full bg-slate-300 mb-2"></span>
+                <span class="text-xs font-black uppercase tracking-widest mb-2 text-slate-500">
+                  {{ task.category.name }}
+                </span>
+              </div>
+              
+              <div class="flex items-center gap-2">
+                <button mat-icon-button (click)="openTaskForm(task)" class="!text-slate-400 hover:!text-indigo-600">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteTask(task.id)" class="!text-slate-400 hover:!text-rose-600">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-4 mb-3">
+              <h3 class="text-2xl font-bold text-slate-800" [ngClass]="{'line-through': task.status === 'DONE'}">
+                {{ task.title }}
+              </h3>
               <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600">
                 {{ task.statusDescription }}
               </span>
             </div>
-            <h3 class="text-2xl font-bold text-slate-800 mb-3" [ngClass]="{'line-through': task.status === 'DONE'}">
-              {{ task.title }}
-            </h3>
             <p class="text-slate-500 text-lg leading-relaxed max-w-3xl">{{ task.description }}</p>
           </div>
 

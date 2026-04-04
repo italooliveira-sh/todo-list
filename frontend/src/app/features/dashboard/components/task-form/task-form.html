@@ -1,0 +1,56 @@
+<h2 mat-dialog-title class="!text-2xl !font-bold !text-slate-800">{{ isEdit ? 'Editar Tarefa' : 'Nova Tarefa' }}</h2>
+
+<mat-dialog-content class="!pt-4">
+  <form [formGroup]="taskForm" class="flex flex-col gap-4 min-w-[300px] sm:min-w-[450px]">
+    
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Título</mat-label>
+      <input matInput formControlName="title" placeholder="O que precisa ser feito?">
+      <mat-error *ngIf="taskForm.get('title')?.hasError('required')">Título é obrigatório</mat-error>
+      <mat-error *ngIf="taskForm.get('title')?.hasError('minlength')">Mínimo de 3 caracteres</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Descrição</mat-label>
+      <textarea matInput formControlName="description" rows="3" placeholder="Detalhes da tarefa..."></textarea>
+    </mat-form-field>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Prioridade</mat-label>
+        <mat-select formControlName="priority">
+          <mat-option *ngFor="let p of priorities" [value]="p.value">
+            {{ p.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="categoryId">
+          <mat-option *ngFor="let cat of categories" [value]="cat.id">
+            {{ cat.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="taskForm.get('categoryId')?.hasError('required')">Categoria é obrigatória</mat-error>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Prazo (Opcional)</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="deadline">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="!pb-6 !px-6 gap-3">
+  <button mat-button (click)="onCancel()" class="!px-6 !py-6 !rounded-xl font-bold text-slate-500">Cancelar</button>
+  <button mat-flat-button (click)="onSubmit()" 
+          class="!bg-indigo-900 !text-white !px-8 !py-6 !rounded-xl font-bold shadow-lg shadow-indigo-100 disabled:!bg-slate-200" 
+          [disabled]="taskForm.invalid">
+    {{ isEdit ? 'Salvar Alterações' : 'Criar Tarefa' }}
+  </button>
+</mat-dialog-actions>

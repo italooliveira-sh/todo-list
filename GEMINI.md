@@ -52,5 +52,6 @@ Este documento serve como a "fonte da verdade" para o estado técnico e as decis
 1. [x] Implementar `AuthService.register` no frontend para conectar com `/api/users`.
 2. [x] Adicionar feedback visual (SnackBar) para erros de login/register.
 3. [x] Implementar listagem de tarefas no Dashboard (UI dinâmica).
-4. [ ] Implementar criação e edição de tarefas (Modal/Formulário).
-5. [ ] Implementar filtros de busca e status.
+4. [x] Implementar criação e edição de tarefas (Modal/Formulário).
+5. [ ] Implementar filtros de busca e status no Dashboard.
+6. [ ] Implementar gestão de Categorias (CRUD de categorias).
