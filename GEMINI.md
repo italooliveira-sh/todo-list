@@ -53,5 +53,6 @@ Este documento serve como a "fonte da verdade" para o estado técnico e as decis
 2. [x] Adicionar feedback visual (SnackBar) para erros de login/register.
 3. [x] Implementar listagem de tarefas no Dashboard (UI dinâmica).
 4. [x] Implementar criação e edição de tarefas (Modal/Formulário).
-5. [ ] Implementar filtros de busca e status no Dashboard.
-6. [ ] Implementar gestão de Categorias (CRUD de categorias).
+5. [x] Refinar interceptor para lidar com tokens expirados (403 automático).
+6. [ ] Implementar filtros de busca e status no Dashboard.
+7. [ ] Implementar gestão de Categorias (CRUD de categorias).
