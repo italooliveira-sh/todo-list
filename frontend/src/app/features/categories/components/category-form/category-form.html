@@ -1,0 +1,40 @@
+<h2 mat-dialog-title class="!text-xl !font-black !text-slate-900 !pt-2">
+  {{ isEdit ? 'Editar Categoria' : 'Nova Categoria' }}
+</h2>
+
+<mat-dialog-content class="!pt-4">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" id="categoryForm" class="flex flex-col gap-4">
+    
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Nome da Categoria</mat-label>
+      <input matInput formControlName="name" placeholder="Ex: Trabalho, Estudos..." maxlength="50">
+      <mat-error *ngIf="form.get('name')?.hasError('required')">O nome é obrigatório</mat-error>
+    </mat-form-field>
+
+    <div class="flex items-center gap-4">
+      <div class="flex-1">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Cor (Hexadecimal)</mat-label>
+          <input matInput formControlName="color" placeholder="#000000">
+          <mat-error *ngIf="form.get('color')?.hasError('required')">A cor é obrigatória</mat-error>
+          <mat-error *ngIf="form.get('color')?.hasError('pattern')">Formato inválido (Ex: #FFFFFF)</mat-error>
+        </mat-form-field>
+      </div>
+      
+      <div class="w-12 h-12 rounded-xl border border-slate-200 shadow-inner flex shrink-0 overflow-hidden">
+        <input type="color" formControlName="color" class="w-full h-full scale-150 cursor-pointer">
+      </div>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="!pb-6 !px-6">
+  <button mat-button (click)="dialogRef.close()" class="!rounded-xl !font-bold">Cancelar</button>
+  <button mat-flat-button color="primary" 
+          type="submit" form="categoryForm"
+          [disabled]="form.invalid"
+          class="!rounded-xl !px-6 !font-bold">
+    {{ isEdit ? 'Salvar Alterações' : 'Criar Categoria' }}
+  </button>
+</mat-dialog-actions>

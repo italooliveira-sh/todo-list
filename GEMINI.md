@@ -54,5 +54,5 @@ Este documento serve como a "fonte da verdade" para o estado técnico e as decis
 3. [x] Implementar listagem de tarefas no Dashboard (UI dinâmica).
 4. [x] Implementar criação e edição de tarefas (Modal/Formulário).
 5. [x] Refinar interceptor para lidar com tokens expirados (403 automático).
-6. [ ] Implementar filtros de busca e status no Dashboard.
-7. [ ] Implementar gestão de Categorias (CRUD de categorias).
+6. [x] Implementar filtros de busca e status no Dashboard.
+7. [x] Implementar gestão de Categorias (CRUD de categorias).
