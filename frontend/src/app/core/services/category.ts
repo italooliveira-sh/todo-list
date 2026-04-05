@@ -16,7 +16,10 @@ export class CategoryService {
 
   findAll(): Observable<Category[]> {
     return this.http.get<Category[]>(this.API_URL).pipe(
-      tap(res => this._categories.set(res))
+      tap(res => {
+        const sorted = [...res].sort((a, b) => a.name.localeCompare(b.name));
+        this._categories.set(sorted);
+      })
     );
   }
 
