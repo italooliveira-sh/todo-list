@@ -101,10 +101,11 @@ export class DashboardComponent implements OnInit {
   }
 
   get stats() {
+    const data = this.filteredTasks;
     return {
-      pending: this.tasks.filter(t => t.status === TaskStatus.PENDING).length,
-      doing: this.tasks.filter(t => t.status === TaskStatus.DOING).length,
-      done: this.tasks.filter(t => t.status === TaskStatus.DONE).length
+      pending: data.filter(t => t.status === TaskStatus.PENDING).length,
+      doing: data.filter(t => t.status === TaskStatus.DOING).length,
+      done: data.filter(t => t.status === TaskStatus.DONE).length
     };
   }
 
