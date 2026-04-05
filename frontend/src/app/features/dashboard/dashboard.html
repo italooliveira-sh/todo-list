@@ -12,8 +12,6 @@
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12">
-      
-      <!-- Card Pendentes -->
       <mat-card class="!p-6 !rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-default !block">
         <div class="!flex !flex-row !items-center !justify-start !gap-6 w-full">
           <div class="w-16 h-16 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
@@ -26,7 +24,6 @@
         </div>
       </mat-card>
 
-      <!-- Card Em Andamento -->
       <mat-card class="!p-6 !rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-default !block">
         <div class="!flex !flex-row !items-center !justify-start !gap-6 w-full">
           <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
@@ -39,7 +36,6 @@
         </div>
       </mat-card>
 
-      <!-- Card Concluídas -->
       <mat-card class="!p-6 !rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-default !block">
         <div class="!flex !flex-row !items-center !justify-start !gap-6 w-full">
           <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
@@ -51,7 +47,6 @@
           </div>
         </div>
       </mat-card>
-
     </div>
 
     <!-- Filtros -->
@@ -60,27 +55,28 @@
         <mat-form-field appearance="outline" class="w-full !mb-0">
           <mat-icon matPrefix class="mr-3 text-slate-400 !w-6 !h-6 flex items-center justify-center overflow-visible">search</mat-icon>
           <mat-label>Pesquisar tarefas...</mat-label>
-          <input matInput>
+          <input matInput [(ngModel)]="searchTerm">
         </mat-form-field>
       </div>
 
       <div class="flex flex-col sm:flex-row items-center gap-10 w-full lg:w-auto">
         <div class="flex flex-col gap-3 w-full sm:w-auto">
           <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Filtrar Status</p>
-          <mat-chip-listbox>
-            <mat-chip-option selected class="!bg-indigo-50 !text-indigo-700">Todos</mat-chip-option>
-            <mat-chip-option>Pendentes</mat-chip-option>
-            <mat-chip-option>Fazendo</mat-chip-option>
-            <mat-chip-option>Feito</mat-chip-option>
+          <mat-chip-listbox [(ngModel)]="statusFilter">
+            <mat-chip-option value="ALL">Todos</mat-chip-option>
+            <mat-chip-option value="PENDING">Pendentes</mat-chip-option>
+            <mat-chip-option value="DOING">Fazendo</mat-chip-option>
+            <mat-chip-option value="DONE">Feito</mat-chip-option>
           </mat-chip-listbox>
         </div>
 
         <div class="flex flex-col gap-3 w-full sm:w-auto">
           <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Filtrar Prioridade</p>
-          <mat-chip-listbox>
-            <mat-chip-option class="!bg-rose-50 !text-rose-600 font-bold">Alta</mat-chip-option>
-            <mat-chip-option class="!bg-amber-50 !text-amber-600 font-bold">Média</mat-chip-option>
-            <mat-chip-option class="!bg-sky-50 !text-sky-600 font-bold">Baixa</mat-chip-option>
+          <mat-chip-listbox [(ngModel)]="priorityFilter">
+            <mat-chip-option value="ALL">Todos</mat-chip-option>
+            <mat-chip-option value="HIGH">Alta</mat-chip-option>
+            <mat-chip-option value="MEDIUM">Média</mat-chip-option>
+            <mat-chip-option value="LOW">Baixa</mat-chip-option>
           </mat-chip-listbox>
         </div>
       </div>
@@ -96,15 +92,15 @@
       </div>
 
       <!-- Lista Vazia -->
-      <div *ngIf="!loading && tasks.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
-        <mat-icon class="!w-16 !h-16 !text-6xl text-slate-200 mb-6 flex items-center justify-center overflow-visible">assignment</mat-icon>
+      <div *ngIf="!loading && filteredTasks.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
+        <mat-icon class="!w-16 !h-16 !text-6xl text-slate-200 mb-6 flex items-center justify-center overflow-visible">search_off</mat-icon>
         <p class="text-slate-500 text-xl font-bold mb-2">Nenhuma tarefa encontrada</p>
-        <p class="text-slate-400 mb-8">Comece criando sua primeira tarefa hoje!</p>
-        <button (click)="openTaskForm()" mat-flat-button class="!bg-indigo-900 !text-white !px-8 !py-6 !rounded-xl font-bold">Criar Tarefa</button>
+        <p class="text-slate-400 mb-8">Tente ajustar seus filtros ou busca.</p>
+        <button (click)="clearFilters()" mat-flat-button class="!bg-indigo-900 !text-white !px-8 !py-6 !rounded-xl font-bold">Limpar Filtros</button>
       </div>
 
       <!-- Cards de Tarefas -->
-      <mat-card *ngFor="let task of tasks" 
+      <mat-card *ngFor="let task of filteredTasks" 
                 class="!p-0 !rounded-3xl shadow-sm border-l-[12px] overflow-hidden hover:shadow-lg transition-all duration-300"
                 [ngClass]="{
                   'border-rose-500': task.priority === 'HIGH',

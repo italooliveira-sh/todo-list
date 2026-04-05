@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TokenService } from '../../core/services/token';
 import { TaskService } from '../../core/services/task';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Task, TaskStatus } from '../../shared/models/task.model';
 import { TaskFormComponent } from './components/task-form/task-form';
 
@@ -20,6 +21,7 @@ import { TaskFormComponent } from './components/task-form/task-form';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -37,6 +39,7 @@ export class DashboardComponent implements OnInit {
   private tokenService = inject(TokenService);
   private taskService = inject(TaskService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
@@ -45,14 +48,36 @@ export class DashboardComponent implements OnInit {
   tasks: Task[] = [];
   loading: boolean = false;
 
+  // Filtros
+  searchTerm: string = '';
+  statusFilter: string = 'ALL';
+  priorityFilter: string = 'ALL';
+  categoryFilterId: string | null = null;
+
+  get filteredTasks(): Task[] {
+    return this.tasks.filter(task => {
+      const matchesSearch = !this.searchTerm || 
+        task.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        task.description.toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      const matchesStatus = this.statusFilter === 'ALL' || task.status === this.statusFilter;
+      const matchesPriority = this.priorityFilter === 'ALL' || task.priority === this.priorityFilter;
+      const matchesCategory = !this.categoryFilterId || task.category.id === this.categoryFilterId;
+
+      return matchesSearch && matchesStatus && matchesPriority && matchesCategory;
+    });
+  }
+
   ngOnInit(): void {
     this.loadTasks();
+    this.route.queryParams.subscribe(params => {
+      this.categoryFilterId = params['categoryId'] || null;
+    });
   }
 
   loadTasks(): void {
     this.loading = true;
     this.cdr.detectChanges();
-    
     this.taskService.findAll().subscribe({
       next: (tasks) => {
         this.tasks = tasks;
@@ -60,12 +85,19 @@ export class DashboardComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Erro ao carregar tarefas', err);
-        this.snackBar.open('Erro ao carregar tarefas. Tente novamente.', 'Fechar', { duration: 5000 });
+        this.snackBar.open('Erro ao carregar tarefas.', 'Fechar', { duration: 5000 });
         this.loading = false;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  // Método para limpar todos os filtros de uma vez
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.statusFilter = 'ALL';
+    this.priorityFilter = 'ALL';
+    this.router.navigate(['/dashboard'], { queryParams: {} });
   }
 
   get stats() {
