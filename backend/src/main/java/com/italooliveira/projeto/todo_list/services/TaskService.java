@@ -9,6 +9,7 @@ import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.ForbiddenActionException;
 import com.italooliveira.projeto.todo_list.exceptions.ResourceNotFoundException;
 import com.italooliveira.projeto.todo_list.exceptions.TaskAlreadyStartedException;
+import com.italooliveira.projeto.todo_list.exceptions.TaskNotStartedException;
 import com.italooliveira.projeto.todo_list.mappers.TaskMapper;
 import com.italooliveira.projeto.todo_list.repositories.TaskRepository;
 import lombok.RequiredArgsConstructor;
@@ -95,6 +96,11 @@ public class TaskService {
         User currentUser = getAuthenticatedUser();
         Task task = findByIdOrThrow(id);
         validateOwnership(task, currentUser);
+
+        if (task.getStatus() != TaskStatus.DOING) {
+            throw new TaskNotStartedException();
+        }
+
         task.setStatus(TaskStatus.DONE);
 
         return taskMapper.toResponseDTO(task);

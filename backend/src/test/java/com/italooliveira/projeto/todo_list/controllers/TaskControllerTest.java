@@ -25,6 +25,7 @@ import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.ForbiddenActionException;
 import com.italooliveira.projeto.todo_list.exceptions.ResourceNotFoundException;
 import com.italooliveira.projeto.todo_list.exceptions.TaskAlreadyStartedException;
+import com.italooliveira.projeto.todo_list.exceptions.TaskNotStartedException;
 import com.italooliveira.projeto.todo_list.services.TaskService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -295,5 +296,18 @@ public class TaskControllerTest extends BaseControllerTest{
 
         mockMvc.perform(patch("/api/tasks/{id}/start", taskId))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 400 ao tentar concluir uma tarefa que não foi iniciada")
+    void shouldReturn400WhenCompletingNotStartedTask() throws Exception {
+        var taskId = UUID.randomUUID();
+        
+        // Simulamos o service lançando a nova exceção
+        when(taskService.completeTask(taskId)).thenThrow(new TaskNotStartedException());
+
+        mockMvc.perform(patch("/api/tasks/{id}/done", taskId))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("A tarefa precisa ser iniciada antes de ser concluída"));
     }
 }

@@ -162,7 +162,8 @@
                 Começar
               </button>
               
-              <button mat-flat-button 
+              <button *ngIf="task.status === 'DOING'"
+                      mat-flat-button 
                       class="!bg-pink-600 !text-white !px-10 !py-6 !rounded-xl flex-1 sm:flex-none font-bold"
                       (click)="completeTask(task.id)">
                 Concluir

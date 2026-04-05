@@ -8,6 +8,7 @@ import com.italooliveira.projeto.todo_list.dto.TaskResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.ForbiddenActionException;
 import com.italooliveira.projeto.todo_list.exceptions.ResourceNotFoundException;
 import com.italooliveira.projeto.todo_list.exceptions.TaskAlreadyStartedException;
+import com.italooliveira.projeto.todo_list.exceptions.TaskNotStartedException;
 import com.italooliveira.projeto.todo_list.domain.enums.Priority;
 import com.italooliveira.projeto.todo_list.domain.enums.TaskStatus;
 import com.italooliveira.projeto.todo_list.mappers.CategoryMapper;
@@ -294,7 +295,7 @@ class TaskServiceTest {
         var task = Task.builder()
                 .id(taskId)
                 .title("Finalizar CRUD")
-                .status(TaskStatus.PENDING)
+                .status(TaskStatus.DOING)
                 .priority(Priority.LOW)
                 .user(user)
                 .build();
@@ -311,6 +312,23 @@ class TaskServiceTest {
         assertEquals(TaskStatus.DONE, result.status());
         assertEquals("Concluída", result.statusDescription());
         assertEquals(TaskStatus.DONE, task.getStatus()); // Verifica o Dirty Checking
+    }
+
+    @Test
+    @DisplayName("Deve lançar TaskNotStartedException ao tentar concluir tarefa que não foi iniciada")
+    void shouldThrowTaskNotStartedExceptionWhenCompletingNotStartedTask() {
+        var taskId = UUID.randomUUID();
+        var user = User.builder().id(UUID.randomUUID()).build();
+        var task = Task.builder()
+                .id(taskId)
+                .user(user)
+                .status(TaskStatus.PENDING)
+                .build();
+
+        mockSecurityContext(user);
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
+
+        assertThrows(TaskNotStartedException.class, () -> taskService.completeTask(taskId));
     }
 
     @Test
