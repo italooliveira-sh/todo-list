@@ -46,7 +46,13 @@ export class CategoryFormComponent implements OnInit {
     });
   }
 
+  updateColor(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.form.get('color')?.setValue(input.value);
+  }
+
   onSubmit(): void {
+
     if (this.form.invalid) return;
 
     const request = this.form.value;

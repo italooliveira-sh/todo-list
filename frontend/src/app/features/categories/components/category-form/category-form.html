@@ -22,7 +22,10 @@
       </div>
       
       <div class="w-12 h-12 rounded-xl border border-slate-200 shadow-inner flex shrink-0 overflow-hidden">
-        <input type="color" formControlName="color" class="w-full h-full scale-150 cursor-pointer">
+        <input type="color" 
+               [value]="form.get('color')?.value"
+               (input)="updateColor($event)"
+               class="w-full h-full scale-150 cursor-pointer">
       </div>
     </div>
 

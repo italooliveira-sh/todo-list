@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,40 +30,27 @@ export class CategoryListComponent implements OnInit {
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
-  categories = signal<Category[]>([]);
+  // Consome o sinal global do serviço
+  categories = this.categoryService.categories;
   displayedColumns: string[] = ['color', 'name', 'taskCount', 'actions'];
 
   ngOnInit(): void {
-    this.loadCategories();
-  }
-
-  loadCategories(): void {
-    this.categoryService.findAll().subscribe({
-      next: (res) => this.categories.set(res),
-      error: () => this.snackBar.open('Erro ao carregar categorias', 'Fechar', { duration: 3000 })
-    });
+    this.categoryService.refresh();
   }
 
   openForm(category?: Category): void {
-    const dialogRef = this.dialog.open(CategoryFormComponent, {
+    this.dialog.open(CategoryFormComponent, {
       width: '400px',
       data: category
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadCategories();
-      }
-    });
+    // Não precisamos mais do afterClosed() para dar refresh, 
+    // pois o CategoryService já faz o refresh no tap()
   }
 
   deleteCategory(category: Category): void {
     if (confirm(`Tem certeza que deseja excluir a categoria "${category.name}"? As tarefas associadas ficarão sem categoria.`)) {
       this.categoryService.delete(category.id).subscribe({
-        next: () => {
-          this.snackBar.open('Categoria excluída com sucesso', 'Sucesso', { duration: 3000 });
-          this.loadCategories();
-        },
+        next: () => this.snackBar.open('Categoria excluída com sucesso', 'Sucesso', { duration: 3000 }),
         error: () => this.snackBar.open('Erro ao excluir categoria', 'Fechar', { duration: 3000 })
       });
     }
