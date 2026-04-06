@@ -29,10 +29,6 @@ public class UserService {
             throw new EmailAlreadyExistsException();
         }
 
-        if (userRepository.existsByName(dto.name())) {
-            throw new UsernameAlreadyExistsException();
-        }
-
         User user = userMapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));
 

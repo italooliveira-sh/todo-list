@@ -4,7 +4,6 @@ import com.italooliveira.projeto.todo_list.domain.User;
 import com.italooliveira.projeto.todo_list.dto.UserRegistrationDTO;
 import com.italooliveira.projeto.todo_list.dto.UserResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.EmailAlreadyExistsException;
-import com.italooliveira.projeto.todo_list.exceptions.UsernameAlreadyExistsException;
 import com.italooliveira.projeto.todo_list.mappers.UserMapper;
 import com.italooliveira.projeto.todo_list.repositories.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -83,18 +82,29 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando o username já estiver cadastrado")
-    void shouldThrowExceptionWhenUsernameAlreadyExists() {
-        UserRegistrationDTO dto = new UserRegistrationDTO("italo_duplicado", "outro@email.com", "senha123");
-        
+    @DisplayName("Deve cadastrar um usuário com sucesso mesmo se o nome já estiver em uso por outro e-mail")
+    void shouldRegisterUserSuccessfullyWhenNameExistsButEmailIsNew() {
+        // Arrange
+        UserRegistrationDTO dto = new UserRegistrationDTO("italo", "novo@email.com", "senha123");
+        String senhaCriptografada = "senhaCriptografada";
+
+        User savedUser = User.builder()
+                .id(UUID.randomUUID())
+                .name(dto.name())
+                .email(dto.email())
+                .password(senhaCriptografada)
+                .build();
+
         when(userRepository.existsByEmail(dto.email())).thenReturn(false);
-        when(userRepository.existsByName(dto.name())).thenReturn(true);
+        when(passwordEncoder.encode(dto.password())).thenReturn(senhaCriptografada);
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-        RuntimeException exception = assertThrows(UsernameAlreadyExistsException.class, () -> {
-            userService.registerUser(dto);
-        });
+        // Act
+        UserResponseDTO result = userService.registerUser(dto);
 
-        assertEquals("Nome de usuário já cadastrado", exception.getMessage());
-        verify(userRepository, never()).save(any(User.class));
+        // Assert
+        assertNotNull(result);
+        assertEquals(dto.name(), result.name());
+        verify(userRepository).save(any(User.class));
     }
 }
