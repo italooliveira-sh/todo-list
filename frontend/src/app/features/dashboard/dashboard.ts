@@ -44,7 +44,7 @@ export class DashboardComponent implements OnInit {
   private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
 
-  userName: string = 'Usuário'; 
+  userName: string = 'Desconhecido'; 
   tasks: Task[] = [];
   loading: boolean = false;
 
@@ -69,6 +69,7 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.userName = this.tokenService.getUserName(); // Adicionado aqui
     this.loadTasks();
     this.route.queryParams.subscribe(params => {
       this.categoryFilterId = params['categoryId'] || null;

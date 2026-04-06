@@ -12,8 +12,9 @@
   </div>
 
   <div class="flex items-center gap-2 md:gap-4">
-    <span class="text-slate-600 text-sm font-medium hidden lg:block">Olá, {{ userName }}</span>
+    <span class="text-slate-700 text-sm font-bold hidden lg:block">{{ userName }}</span>
     <div class="w-9 h-9 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 font-bold text-sm shadow-inner">
+
       {{ userInitials }}
     </div>
     <button mat-icon-button color="warn" (click)="logout()">

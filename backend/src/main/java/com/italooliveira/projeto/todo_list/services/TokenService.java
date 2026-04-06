@@ -24,6 +24,8 @@ public class TokenService {
         
         return Jwts.builder()
                 .subject(user.getEmail())
+                .claim("name", user.getName())
+                .claim("email", user.getEmail())
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plusSeconds(7200))) // 2 horas
                 .signWith(key)
