@@ -16,7 +16,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-task-form',
   standalone: true,
-  providers: [provideNativeDateAdapter()],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -50,10 +49,11 @@ export class TaskFormComponent implements OnInit {
     description: [''],
     priority: [Priority.LOW, [Validators.required]],
     categoryId: ['', [Validators.required]],
-    deadline: ['']
+    deadline: [null as any]
   });
 
   isEdit = false;
+  minDate = new Date(); // Adicionado aqui
 
   ngOnInit(): void {
     this.loadCategories();
