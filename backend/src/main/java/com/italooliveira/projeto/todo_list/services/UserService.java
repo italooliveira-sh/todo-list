@@ -8,7 +8,6 @@ import com.italooliveira.projeto.todo_list.domain.User;
 import com.italooliveira.projeto.todo_list.dto.UserRegistrationDTO;
 import com.italooliveira.projeto.todo_list.dto.UserResponseDTO;
 import com.italooliveira.projeto.todo_list.exceptions.EmailAlreadyExistsException;
-import com.italooliveira.projeto.todo_list.exceptions.UsernameAlreadyExistsException;
 import com.italooliveira.projeto.todo_list.mappers.UserMapper;
 import com.italooliveira.projeto.todo_list.repositories.UserRepository;
 
