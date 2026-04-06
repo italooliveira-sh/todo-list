@@ -54,8 +54,14 @@ export class LoginComponent {
         error: (err) => {
           console.error('Erro ao fazer login', err);
           
-          // Tenta extrair a mensagem do backend (ApiErrorMessage)
-          const errorMessage = err.error?.message || 'E-mail ou senha inválidos. Tente novamente.';
+          let errorMessage = err.error?.message || 'E-mail ou senha inválidos.';
+          
+          if (err.error?.errors) {
+            const fieldErrors = Object.values(err.error.errors);
+            if (fieldErrors.length > 0) {
+              errorMessage = fieldErrors[0] as string;
+            }
+          }
           
           this.snackBar.open(errorMessage, 'Fechar', {
             duration: 5000,

@@ -108,8 +108,16 @@ export class TaskFormComponent implements OnInit {
   }
 
   private handleError(err: any): void {
-    const msg = err.error?.message || 'Erro ao salvar tarefa.';
-    this.snackBar.open(msg, 'Fechar', { duration: 5000 });
+    let errorMessage = err.error?.message || 'Erro ao salvar tarefa.';
+    
+    if (err.error?.errors) {
+      const fieldErrors = Object.values(err.error.errors);
+      if (fieldErrors.length > 0) {
+        errorMessage = fieldErrors[0] as string;
+      }
+    }
+    
+    this.snackBar.open(errorMessage, 'Fechar', { duration: 5000 });
   }
 
   onCancel(): void {
