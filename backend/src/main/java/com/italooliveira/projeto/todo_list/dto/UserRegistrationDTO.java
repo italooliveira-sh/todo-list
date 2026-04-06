@@ -1,7 +1,7 @@
 package com.italooliveira.projeto.todo_list.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record UserRegistrationDTO(
@@ -9,7 +9,7 @@ public record UserRegistrationDTO(
     String name,
 
     @NotBlank(message = "O e-mail é obrigatório")
-    @Email(message = "O e-mail deve ser válido")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "O e-mail informado é inválido")
     String email,
 
     @NotBlank(message = "A senha é obrigatória")
