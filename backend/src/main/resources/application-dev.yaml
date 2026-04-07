@@ -2,12 +2,12 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/todopro_db
     username: todopro_user
-    password: ${DB_PASSWORD}
+    password: todopro_password
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate # Com Flyway, o Hibernate APENAS valida
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
