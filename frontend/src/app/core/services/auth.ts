@@ -10,7 +10,7 @@ import { Observable, tap } from 'rxjs';
 export class AuthService {
   private http = inject(HttpClient);
   private tokenService = inject(TokenService);
-  private readonly API_HOST = 'http://localhost:8080/api';
+  private readonly API_HOST = '/api';
 
   login(data: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.API_HOST}/auth/login`, data).pipe(

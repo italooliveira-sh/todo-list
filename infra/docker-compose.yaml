@@ -1,4 +1,5 @@
 services:
+  # 1. Banco de Dados PostgreSQL
   db:
     image: postgres:16-alpine
     container_name: todo-pro-db
@@ -8,23 +9,44 @@ services:
       POSTGRES_PASSWORD: todopro_password
       POSTGRES_DB: todopro_db
     ports:
-      - "5433:5432" # Porta 5433 no seu PC -> 5432 no Docker
+      - "5432:5432" # Expõe para você acessar via DBeaver/PgAdmin se quiser
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - todo-network
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: todo-pro-pgadmin
+  # 2. Backend (Spring Boot API)
+  backend:
+    build: 
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: todo-pro-backend
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      # Sobrescreve as configurações do application.yml para o ambiente Docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/todopro_db
+      SPRING_DATASOURCE_USERNAME: todopro_user
+      SPRING_DATASOURCE_PASSWORD: todopro_password
+      # Segredo para assinatura dos Tokens JWT
+      API_SECURITY_TOKEN_SECRET: ${JWT_SECRET:-minha-chave-secreta-muito-segura-para-desenvolvimento}
     ports:
-      - "9000:80"
+      - "8080:8080"
     depends_on:
       - db
+    networks:
+      - todo-network
+
+  # 3. Frontend (Angular App via Nginx)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: todo-pro-frontend
+    restart: always
+    ports:
+      - "80:80" # Acesse o app em http://localhost
+    depends_on:
+      - backend
     networks:
       - todo-network
 

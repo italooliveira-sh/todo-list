@@ -8,7 +8,7 @@ import { Task, TaskRequest } from '../../shared/models/task.model';
 })
 export class TaskService {
   private http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:8080/api/tasks';
+  private readonly API_URL = '/api/tasks';
 
   findAll(): Observable<Task[]> {
     return this.http.get<Task[]>(this.API_URL);

@@ -8,7 +8,7 @@ import { Category, CategoryRequest } from '../../shared/models/task.model';
 })
 export class CategoryService {
   private http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:8080/api/categories';
+  private readonly API_URL = '/api/categories';
 
   // Fonte única da verdade para categorias em toda a aplicação
   private _categories = signal<Category[]>([]);
