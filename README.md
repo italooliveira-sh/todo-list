@@ -96,4 +96,4 @@ docker-compose up -d --build
 ## 👤 Autor
 
 **Italo Oliveira** - Desenvolvedor Fullstack
-[LinkedIn](https://www.linkedin.com/in/italo-oliveira-dev/) | [GitHub](https://github.com/ItaloOliveira-dev)
+[LinkedIn](https://www.linkedin.com/in/italo-oliveira-xd/) | [GitHub](https://github.com/ItaloOliveira-sh)
