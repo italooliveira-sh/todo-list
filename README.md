@@ -1,87 +1,99 @@
-# 🚀 To-Do Pro - Fullstack Task Management
+# 🚀 ToDo Pro - Task Management Intelligence
 
-[![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=java)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.x-brightgreen?style=flat-square&logo=spring-boot)](https://spring.io/projects/spring-boot)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
-[![JWT](https://img.shields.io/badge/JWT-Authentication-black?style=flat-square&logo=json-web-tokens)](https://jwt.io/)
+[![Java 21](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)](https://www.oracle.com/java/)
+[![Spring Boot 3.4](https://img.shields.io/badge/Spring%20Boot-3.4-brightgreen?style=for-the-badge&logo=spring-boot)](https://spring.io/projects/spring-boot)
+[![Angular 19](https://img.shields.io/badge/Angular-19-red?style=for-the-badge&logo=angular)](https://angular.io/)
+[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind--blue?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Docker](https://img.shields.io/badge/Docker-Container-blue?style=for-the-badge&logo=docker)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-O **To-Do Pro** é uma plataforma robusta de gerenciamento de tarefas multiusuário, desenvolvida com foco em segurança, escalabilidade e boas práticas de engenharia de software. O projeto serve como um showcase técnico de uma arquitetura limpa em camadas utilizando **Spring Boot 3** e **Java 21**.
-
----
-
-## 🎯 Diferenciais Técnicos
-
-- **Segurança Avançada:** Implementação de autenticação STATELESS via **JWT**, utilizando os padrões oficiais do **Spring Security 6**.
-- **TDD (Test-Driven Development):** Desenvolvimento guiado por testes, garantindo mais de 90% de cobertura nas camadas de Service e Controller.
-- **Categorização Inteligente:** Sistema flexível de categorias por usuário com contador de tarefas integrado.
-- **Arquitetura Limpa:** Separação clara de responsabilidades entre Domínio, DTOs, Mappers, Services e Controllers.
-- **Padrões de Resposta:** Tratamento global de exceções com mensagens padronizadas e códigos de status HTTP semânticos.
+O **ToDo Pro** é uma plataforma de gerenciamento de tarefas multiusuário de alta performance, projetada com foco em segurança, escalabilidade e UX fluida. O projeto demonstra a aplicação prática de conceitos avançados de engenharia de software, unindo um backend reativo e testado a um frontend moderno movido a **Signals**.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 💎 Diferenciais do Projeto
 
-### Backend
-- **Java 21 (LTS)** & **Spring Boot 3.4**
-- **Spring Data JPA** & **Hibernate**
-- **PostgreSQL** (Banco de dados relacional)
-- **Flyway** (Gerenciamento de migrações de DB)
-- **Spring Security** & **jjwt** (Segurança e Tokens)
-- **JUnit 5** & **Mockito** (Testes Automatizados)
-- **Lombok** (Produtividade)
-
-### Frontend (Em Breve)
-- **Angular 19**
-- **Material UI**
+- **Arquitetura Reativa com Signals:** Utilização do novo motor de reatividade do Angular 19 para um gerenciamento de estado granular, eliminando problemas de ciclo de vida e otimizando a renderização.
+- **Segurança Stateless Avançada:** Autenticação via **JWT (JSON Web Tokens)** com extração dinâmica de metadados (*name*, *email*), permitindo que o frontend opere de forma totalmente desacoplada do estado da sessão do servidor.
+- **TDD (Test-Driven Development):** Cobertura rigorosa das camadas de serviço e controladores, garantindo que as regras de negócio sejam invioláveis desde a concepção.
+- **Infraestrutura Multi-Cloud:** Configuração pronta para deploy distribuído (Vercel + Render + Supabase), com suporte nativo a Docker e Proxy reverso via Nginx para mitigação de CORS.
+- **UI/UX Premium:** Interface construída com **Tailwind CSS 4** e **Angular Material**, apresentando modo colapsável, layouts compartilhados e feedbacks instantâneos.
 
 ---
 
-## 🏗️ Estrutura do Projeto
+## ✨ Funcionalidades Principais
+
+| Categoria | Funcionalidades |
+| :--- | :--- |
+| **Autenticação** | Login/Registro, Validação de E-mail via Regex, Iniciais dinâmicas no Avatar. |
+| **Gestão de Tarefas** | CRUD Completo, Priorização (Alta/Média/Baixa), Workflow Pendente -> Fazendo -> Concluído. |
+| **Categorias** | Gestão de categorias com cores customizadas e sincronização em tempo real via Signals. |
+| **Dashboard** | Estatísticas reativas a filtros de busca, categoria e status. |
+| **Segurança** | Bloqueio de prazos retroativos, isolamento de dados entre usuários, validação Bean Validation. |
+
+---
+
+## 🛠️ Stack Tecnológica
+
+### Backend (The Brain)
+- **Spring Boot 3.4** (Framework Base)
+- **Spring Security 6** (Segurança e JWT)
+- **Spring Data JPA** & **PostgreSQL** (Persistência)
+- **Flyway** (Evolutionary Database Design)
+- **JUnit 5 & Mockito** (Quality Assurance)
+
+### Frontend (The Face)
+- **Angular 19** (Signals & Standalone Components)
+- **Tailwind CSS 4** (Estilização de Próxima Geração)
+- **Angular Material** (Enterprise UI Components)
+- **RxJS** (Asynchronous Stream Processing)
+
+---
+
+## 🏗️ Arquitetura e Organização
 
 ```text
-├── backend/                # API REST Spring Boot
-│   ├── src/main/java       # Código fonte organizado por camadas
-│   ├── src/test/java       # Suite de testes unitários e de integração
-│   └── build.gradle        # Gerenciamento de dependências
-├── docs/                   # Documentação técnica detalhada
-│   ├── REQUISITOS.md       # Regras de negócio e funcionalidades
-│   ├── ARQUITETURA.md      # Decisões de design e MER
-│   └── API.md              # Documentação detalhada dos Endpoints
-├── infra/                  # Arquivos de infraestrutura (Docker Compose)
-└── README.md               # Visão geral do projeto
+├── backend/                # API RESTful robusta
+│   ├── domain/             # Entidades e Regras de Negócio
+│   ├── dto/                # Contratos de entrada/saída (Data Transfer Objects)
+│   ├── services/           # Lógica centralizada e Transações
+│   ├── mappers/            # Desacoplamento entre Entidades e DTOs
+│   └── exceptions/         # Tratamento global de erros padronizado
+├── frontend/               # Aplicação SPA moderna
+│   ├── core/               # Singletons (Services, Interceptors, Guards)
+│   ├── features/           # Módulos independentes por funcionalidade
+│   └── shared/             # Componentes comuns e Layouts estruturais
+├── docs/                   # Documentação de Engenharia
+└── infra/                  # Docker Compose & Orquestração
 ```
 
 ---
 
-## 🚀 Como Executar
+## 🚀 Guia de Execução Rápida
 
-### Pré-requisitos
-- Java 21+
-- Docker & Docker Compose
-
-### Executando o Banco de Dados (Postgres)
+### Via Docker (Recomendado)
 ```bash
 cd infra
-docker-compose up -d
+docker-compose up -d --build
 ```
+- Frontend: `http://localhost`
+- Backend API: `http://localhost:8080`
 
-### Executando o Backend
-```bash
-cd backend
-./gradlew bootRun
-```
-
-A API estará disponível em `http://localhost:8080`. Você pode conferir a documentação interativa em `http://localhost:8080/swagger-ui.html`.
+### Via Local (Desenvolvimento)
+1. **Backend:** `./gradlew bootRun`
+2. **Frontend:** `npm install && npm start`
 
 ---
 
-## 📄 Documentação da API
+## 📄 Documentação Técnica Detalhada
 
-Para detalhes sobre cada endpoint, modelos de requisição e resposta, consulte o nosso guia:
-👉 **[Guia da API (docs/API.md)](./docs/API.md)**
+- 📘 **[Guia da API (Endpoints)](./docs/API.md)**
+- 🏗️ **[Decisões de Arquitetura](./docs/ARQUITETURA.md)**
+- 📝 **[Histórico de Requisitos](./docs/REQUISITOS.md)**
 
 ---
 
 ## 👤 Autor
 
-**Italo Oliveira** - [LinkedIn](https://www.linkedin.com/in/italo-oliveira-dev/) | [GitHub](https://github.com/ItaloOliveira-dev)
+**Italo Oliveira** - Desenvolvedor Fullstack
+[LinkedIn](https://www.linkedin.com/in/italo-oliveira-dev/) | [GitHub](https://github.com/ItaloOliveira-dev)

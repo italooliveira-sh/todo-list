@@ -5,54 +5,49 @@ Este documento serve como a "fonte da verdade" para o estado técnico e as decis
 ## 🏗️ ARQUITETURA GERAL
 
 - **Backend:** Java 21 + Spring Boot 3.4.10.
-- **Frontend:** Angular 19+ + Tailwind CSS + Angular Material.
-- **Banco de Dados:** PostgreSQL (gerenciado via Flyway migrations).
-- **Segurança:** Autenticação baseada em JWT (Stateless).
+- **Frontend:** Angular 19 + Tailwind CSS 4 + Angular Material.
+- **Gerenciamento de Estado:** Signals (Angular 19 native).
+- **Banco de Dados:** PostgreSQL (Gerenciado via Supabase).
+- **Infraestrutura:** Docker, Docker Compose, Nginx Proxy.
+- **Segurança:** Autenticação baseada em JWT (Stateless) com Claims customizadas.
 
 ---
 
-## 🚀 ESTADO DAS FUNCIONALIDADES
+## 🚀 ESTADO DAS FUNCIONALIDADES (v1.0.0)
 
-### 1. Autenticação e Usuários
-- **Backend:** 
-  - ✅ Registro de usuário (`UserService.registerUser`) com criação automática de categorias padrão.
-  - ✅ Login via `AuthService.login` gerando JWT.
-  - ✅ Proteção de rotas via `SecurityFilter`.
-- **Frontend:**
-  - ✅ Tela de Login (Refatorada com layout compartilhado).
-  - ✅ Tela de Registro (Layout independente com validação de senha).
-  - ✅ `TokenService` para armazenamento local do JWT.
-  - ✅ `AuthService`: Método `login` e `register` prontos.
-  - ✅ `TaskService`: CRUD completo de tarefas pronto.
+### 1. Autenticação e Perfil
+- ✅ Registro de usuário com validação Regex rigorosa.
+- ✅ Login via JWT com extração dinâmica de metadados no frontend.
+- ✅ Avatar dinâmico com lógica de iniciais (Composto vs Único).
+- ✅ Normalização de nomes para Title Case.
 
-### 2. Gestão de Tarefas e Categorias (Backend Pronto)
-- ✅ CRUD completo de Tarefas (com prioridades e status).
-- ✅ CRUD completo de Categorias.
-- ✅ Filtragem e busca implementadas.
-- ⚠️ **Frontend:** Telas de Dashboard e CRUD iniciadas.
+### 2. Gestão de Tarefas e Categorias
+- ✅ CRUD completo de Tarefas com Workflow controlado.
+- ✅ CRUD completo de Categorias com cores e sincronização via Signals.
+- ✅ Filtros dinâmicos e Busca Textual.
+- ✅ Stats Cards reativos no Dashboard.
+
+### 3. Infraestrutura e Qualidade
+- ✅ Cobertura de Testes Unitários e Integração (TDD).
+- ✅ Containerização completa via Docker.
+- ✅ Suporte a Deploy Multi-Cloud (Vercel + Render + Supabase).
+- ✅ Documentação técnica detalhada (API, Arquitetura, Requisitos).
 
 ---
 
 ## 🎨 PADRÕES E CONVENÇÕES ESTABELECIDOS
 
 1. **Idioma:**
-   - Código, símbolos e nomes de arquivos: **Inglês**.
-   - Mensagens de erro, feedback e logs de commit: **Português**.
+   - Código e nomes de arquivos: **Inglês**.
+   - Mensagens de erro e documentação: **Português**.
 2. **Frontend UI:**
-   - Uso de `AuthLayoutComponent` para centralizar a estética de login/registro.
-   - Uso de `MainLayout` para a aplicação autenticada (Header, Sidebar, Footer).
-   - Estilo: Tailwind CSS para layout e Material para componentes.
-3. **Erros e Exceções:**
-   - Backend: Centralizado em `GlobalExceptionHandler`.
-   - Frontend: `auth.interceptor.ts` pronto para lidar com tokens.
+   - Uso de Signals para Single Source of Truth.
+   - Layout Pattern para isolamento de contextos (Auth vs Main).
+3. **Segurança:**
+   - Bloqueio de prazos retroativos.
+   - Proteção de transições de status (Pendente -> Fazendo -> Concluído).
 
 ---
 
-## 📌 PRÓXIMOS PASSOS (TASK LIST)
-1. [x] Implementar `AuthService.register` no frontend para conectar com `/api/users`.
-2. [x] Adicionar feedback visual (SnackBar) para erros de login/register.
-3. [x] Implementar listagem de tarefas no Dashboard (UI dinâmica).
-4. [x] Implementar criação e edição de tarefas (Modal/Formulário).
-5. [x] Refinar interceptor para lidar com tokens expirados (403 automático).
-6. [x] Implementar filtros de busca e status no Dashboard.
-7. [x] Implementar gestão de Categorias (CRUD de categorias).
+## 🏆 PROJETO CONCLUÍDO (v1.0.0)
+Todas as metas iniciais e melhorias incrementais foram entregues com sucesso.

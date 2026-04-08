@@ -1,127 +1,109 @@
-# 📖 Guia da API - To-Do Pro
+# 📖 Guia de Referência da API: ToDo Pro
 
-Esta documentação detalha os endpoints disponíveis na API, os formatos de requisição e resposta, e os mecanismos de autenticação.
+Esta documentação fornece os detalhes técnicos necessários para interagir com a API do ToDo Pro.
 
 ---
 
-## 🔐 Autenticação
+## 🔐 Autenticação e Segurança
 
-A API utiliza **JWT (JSON Web Token)** para autenticação. Todas as requisições (exceto login e cadastro) exigem o cabeçalho `Authorization`.
+A API utiliza **JWT (JSON Web Token)** para autenticação. Todas as rotas protegidas exigem o envio do token no cabeçalho `Authorization`.
 
 **Formato:** `Authorization: Bearer <seu_token>`
 
+### 💎 Estrutura do Token (Claims)
+O token gerado no login é **Self-contained** e contém metadados para otimização do frontend:
+- `name`: Nome completo formatado para exibição.
+- `email`: Identificador único do usuário.
+- `exp`: Prazo de expiração (2 horas).
+
 ---
 
-## 👤 Usuários & Autenticação (`/api/auth`, `/api/users`)
+## 👤 Endpoints de Usuário (`/api/users`, `/api/auth`)
 
-### Cadastro de Usuário
-- **Endpoint:** `POST /api/users`
-- **Acesso:** Público
-- **Request:**
+### Registro de Novo Usuário
+`POST /api/users`
+- **Payload:**
 ```json
 {
-  "name": "italo",
+  "name": "Italo Oliveira",
   "email": "italo@email.com",
-  "password": "senha123"
+  "password": "senha_segura_123"
 }
 ```
-- **Response:** `201 Created`
+- **Validações:** E-mail via Regex rigoroso, Senha (mín. 6 chars), Nome (mín. 3 chars).
 
-### Login
-- **Endpoint:** `POST /api/auth/login`
-- **Acesso:** Público
-- **Response:** `200 OK`
+### Autenticação (Login)
+`POST /api/auth/login`
+- **Payload:**
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "email": "italo@email.com",
+  "password": "senha_segura_123"
+}
+```
+- **Resposta (200 OK):**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ..."
 }
 ```
 
 ---
 
-## 📂 Categorias (`/api/categories`)
+## 📂 Endpoints de Categoria (`/api/categories`)
 
-### Criar Categoria
-- **Endpoint:** `POST /api/categories`
-- **Acesso:** Autenticado
-- **Request:**
+### Listar Categorias do Usuário
+`GET /api/categories`
+- **Resposta:** Lista de categorias ordenadas alfabeticamente, incluindo o `taskCount` (contagem de tarefas vinculadas).
+
+### Criar/Editar Categoria
+`POST /api/categories` | `PUT /api/categories/{id}`
+- **Payload:**
 ```json
 {
   "name": "Trabalho",
-  "color": "#FF0000"
+  "color": "#4169E1"
 }
-```
-- **Response:** `201 Created`
-
-### Listar Categorias
-- **Endpoint:** `GET /api/categories`
-- **Acesso:** Autenticado (Retorna apenas as categorias do usuário logado)
-- **Response:** `200 OK`
-```json
-[
-  {
-    "id": "uuid-1",
-    "name": "Trabalho",
-    "color": "#FF0000",
-    "taskCount": 5
-  }
-]
 ```
 
 ---
 
-## ✅ Tarefas (`/api/tasks`)
+## ✅ Endpoints de Tarefa (`/api/tasks`)
 
 ### Criar Tarefa
-- **Endpoint:** `POST /api/tasks`
-- **Acesso:** Autenticado
-- **Request:**
+`POST /api/tasks`
+- **Payload:**
 ```json
 {
-  "title": "Finalizar documentação",
-  "description": "Escrever o arquivo API.md",
+  "title": "Finalizar v1.0",
+  "description": "Revisar documentação e infra",
   "priority": "HIGH",
-  "deadline": "2026-03-30T10:00:00",
+  "deadline": "2026-04-10T10:00:00",
   "categoryId": "uuid-da-categoria"
 }
 ```
-- **Response:** `201 Created`
+- **Regra:** O `deadline` não pode ser uma data no passado.
 
-### Listar Todas as Tarefas
-- **Endpoint:** `GET /api/tasks`
-- **Acesso:** Autenticado
-- **Response:** `200 OK`
-
-### Atualizar Tarefa
-- **Endpoint:** `PUT /api/tasks/{id}`
-- **Acesso:** Autenticado (Dono da tarefa)
-
-### Transições de Status
-- **Iniciar:** `PATCH /api/tasks/{id}/start` (Muda para `DOING`)
-- **Concluir:** `PATCH /api/tasks/{id}/done` (Muda para `DONE`)
+### Transições de Workflow (PATCH)
+- **Iniciar:** `/api/tasks/{id}/start` ➔ Muda para `DOING`.
+- **Concluir:** `/api/tasks/{id}/done` ➔ Muda para `DONE`.
+    - *Nota:* Só é permitido concluir se a tarefa estiver em `DOING`.
 
 ---
 
-## ⚠️ Tratamento de Erros
+## ⚠️ Padronização de Erros
 
-A API utiliza um formato padronizado para mensagens de erro:
+Em caso de falha (4xx ou 5xx), a API retorna o objeto `ApiErrorMessage`:
 
 ```json
 {
-  "timestamp": "2026-03-27T02:00:00Z",
+  "timestamp": "2026-04-08T10:00:00Z",
   "status": 400,
-  "statusText": "Bad Request",
   "message": "Campos inválidos",
-  "path": "/api/tasks",
-  "method": "POST",
   "errors": {
-    "title": "O título é obrigatório"
-  }
+    "email": "O e-mail informado é inválido"
+  },
+  "path": "/api/users",
+  "method": "POST"
 }
 ```
-
-### Códigos Comuns:
-- `401 Unauthorized`: Token ausente ou inválido.
-- `403 Forbidden`: Tentativa de acessar recurso de outro usuário.
-- `404 Not Found`: Recurso não encontrado.
-- `409 Conflict`: Violação de unicidade (ex: nome de categoria duplicado).
