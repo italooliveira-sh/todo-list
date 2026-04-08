@@ -112,8 +112,9 @@ export class DashboardComponent implements OnInit {
 
   openTaskForm(task?: Task): void {
     const dialogRef = this.dialog.open(TaskFormComponent, {
-      width: 'auto',
-      maxWidth: '90vw',
+      width: '100%',
+      maxWidth: '500px',
+      panelClass: 'responsive-dialog',
       data: task
     });
 
