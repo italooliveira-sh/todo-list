@@ -3,7 +3,6 @@
   "rewrites": [
     {
       "source": "/api/:match*",
-      "destination": "https://todo-list-32rh.onrender.com/api/:match*"
     },
     {
       "source": "/(.*)",
